@@ -28,5 +28,12 @@ export default defineNuxtConfig({
       title:"Reminza"
     }
   },
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss"]
+  auth: {
+    provider: {
+      type: 'authjs',
+      defaultProvider:"google",
+    },
+    globalAppMiddleware:true,
+  },
+  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss",'@sidebase/nuxt-auth']
 })

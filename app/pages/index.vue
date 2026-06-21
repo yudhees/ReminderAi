@@ -1,5 +1,5 @@
 <template>
-    <button 
+    <button @click="signIn('google')"
         class="flex items-center justify-center gap-3 w-full bg-white text-slate-900 rounded-xl py-3.5 text-[15px] font-bold cursor-pointer shadow-lg shadow-black/30 transition-transform hover:-translate-y-0.5 hover:shadow-xl">
         <svg class="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -17,10 +17,18 @@
         </svg>
         Continue with Google
     </button>
+    {{ status }}
 </template>
 <script setup>
+
+const { signIn,status } = useAuth()
+
 definePageMeta({
-    layout: "auth"
+    layout: "auth",
+    auth: {
+        unauthenticatedOnly:true,
+        navigateAuthenticatedTo:"/dashboard"
+    },
 })
 
 </script>
