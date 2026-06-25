@@ -17,12 +17,10 @@
         </svg>
         Continue with Google
     </button>
-    {{ status }}
 </template>
 <script setup>
 
-const { signIn,status } = useAuth()
-
+const { signIn } = useAuth()
 definePageMeta({
     layout: "auth",
     auth: {

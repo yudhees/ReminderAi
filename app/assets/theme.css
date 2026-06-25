@@ -1,12 +1,30 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-#__nuxt{
+#__nuxt {
   display: contents;
 }
 
 html,
-  body {
-    @apply h-screen bg-[#0f0f13] text-slate-100 font-sans;
-  }
+body {
+  @apply h-screen bg-[#0f0f13] text-slate-100 font-sans;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+}
