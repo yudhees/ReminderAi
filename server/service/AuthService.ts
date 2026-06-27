@@ -1,5 +1,5 @@
 import { getServerSession } from "#auth";
-import { User } from '../models/users';
+import { User, UserDocument } from '../models/users';
 import type { H3Event } from "h3";
 export default class AuthSerive{
     protected User=User
@@ -7,7 +7,7 @@ export default class AuthSerive{
     constructor(eve:H3Event){
         this.event=eve
     }
-    public async user() {
+    public async user():Promise<null|UserDocument> {
         const sessionData=await getServerSession(this.event)
         const user=sessionData?.user
         if(!user)return null;

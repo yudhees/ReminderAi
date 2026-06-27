@@ -48,11 +48,12 @@ import Select from "~/components/ui/Select.vue";
 const { setLabel, setDescription } = useTopBarStore();
 const {user,logout}=useAuthStore()
 const form =reactive({
-     ...pick(user,["ai_input_language",'push_notification','email_reminders','sound_alerts','default_daily_reminders_in_mins','ai_input_language']),
+     ...pick(user,["ai_input_language",'push_notification','email_reminders','sound_alerts','default_daily_reminders_in_mins']),
 })
 const save=async(key)=>{
      try {
           const res=await $fetch('/api/user/updateProfile',{method:"POST",body:{[key]:form[key]}})
+          success("Saved")
      } catch (error) {
         console.error(error)
      }
@@ -62,12 +63,12 @@ const reminderOptions=[
      {label:'30 minues',value:30},
      {label:'1 hour',value:60},
 ]
-const languageOptions=[
-     {label:"English",value:'english'},
-     {label:"Tamil",value:'tamil'},
-     {label:"Hindi",value:'hindi'},
-     {label:"Spanish",value:'spanish'},
-]
+const languageOptions=speechLanguages.map(val=>{
+     return {
+          label:val.name,
+          value:val.code
+     }
+})
 onMounted(() => {
      setLabel("⚙️ Settings");
      setDescription("");

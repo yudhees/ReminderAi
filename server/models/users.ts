@@ -1,4 +1,5 @@
 import defineModel from './default';
+import { InferSchemaType, HydratedDocument } from "mongoose";
 
 
 export const User = defineModel("users", {
@@ -16,3 +17,8 @@ export const User = defineModel("users", {
         unique: true,
     },
 })
+
+
+type User = InferSchemaType<typeof User>;
+export type UserDocument = HydratedDocument<User>;
+

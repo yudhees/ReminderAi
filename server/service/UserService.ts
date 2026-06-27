@@ -1,6 +1,6 @@
 import type { User as AuthUser } from "next-auth";
 import { User } from '../models/users';
-
+import type {UserDocument} from "../models/users"
 export default class UserService{
     protected User=User;
     public async authenticaeUser(authUser:Required<AuthUser>)
@@ -30,8 +30,9 @@ export default class UserService{
         )
         return user;
     }
-    public async updateUser(User:any,set:Record<string,any>){
-        return {};
+    public async updateUser(User:UserDocument,set:Record<string,any>){
+        User.set(set);        
+        await User.save()
     }
     public async user(email:string)
     {
