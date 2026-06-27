@@ -2,8 +2,8 @@ import { NuxtAuthHandler } from '#auth'
 import { User } from 'next-auth';
 import GoogleProvider from "next-auth/providers/google";
 import UserService from '~~/server/service/UserService';
-import merge from "lodash/merge"
-import pick from "lodash/pick"
+import merge from "lodash/merge.js"
+import pick from "lodash/pick.js"
 export default NuxtAuthHandler({
     secret: process.env.AUTH_SECRET,
 
