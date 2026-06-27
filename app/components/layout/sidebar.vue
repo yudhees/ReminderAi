@@ -26,7 +26,7 @@ import AppLogo from './AppLogo.vue';
 const {user}=useAuthStore()
 const routes = [
   { label: "🏠 Dashboard" ,to:{name:"dashboard"}},
-  { label: "➕ New Reminder",to:{}},
+  { label: "➕ New Reminder",to:{name:"chat-id",params:{id:'new'}}},
   { label: "📋 All Reminders",to:{}},
   { label: "🔔 Notifications",to:{}},
   { label: "⚙️ Settings", to:{name:"profile"}},
