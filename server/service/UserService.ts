@@ -1,5 +1,5 @@
 import type { User as AuthUser } from "next-auth";
-import { User } from "../models/users";
+import { User } from '../models/users';
 
 export default class UserService{
     protected User=User;
@@ -22,12 +22,16 @@ export default class UserService{
                     push_notification:true,
                     email_reminders:false,
                     sound_alerts:true,
-                    default_daily_reminders_in_mins:15
+                    default_daily_reminders_in_mins:15,
+                    ai_input_language:"en-US"
                 }
             },
             {upsert:true,returnDocument:"after"}
         )
         return user;
+    }
+    public async updateUser(User:any,set:Record<string,any>){
+        return {};
     }
     public async user(email:string)
     {

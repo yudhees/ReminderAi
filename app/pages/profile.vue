@@ -18,23 +18,28 @@
                     </div>
                </ProfileCard>
                <ProfileCard heading="🔔 Notifications">
-                    <NotificationBarLayout heading="Push Notifications" description="Receive alerts in browser"/>
-                    <NotificationBarLayout heading="Email Reminders" description="Backup alerts to your email"/>
-                    <NotificationBarLayout heading="Email Reminders" description="Backup alerts to your email"/>
-                    <NotificationBarLayout heading="Sound Alerts" description="Play a chime when reminder fires"/>
+                    <NotificationBarLayout heading="Push Notifications" description="Receive alerts in browser" v-model="form.push_notification" 
+                    @change="save('push_notification')"/>
+                    <NotificationBarLayout heading="Email Reminders" description="Backup alerts to your email" v-model="form.email_reminders"
+                    @change="save('email_reminders')"
+                    />
+                    <NotificationBarLayout heading="Sound Alerts" description="Play a chime when reminder fires" v-model="form.sound_alerts"
+                    @change="save('sound_alerts')"
+                    />
                     <NotificationBarLayout heading="Default Early Reminder" description="Notify me before the set time">
-                         <Select :options="reminderOptions"/>
+                         <Select :options="reminderOptions" v-model="form.default_daily_reminders_in_mins"  @change="save('default_daily_reminders_in_mins')"/>
                     </NotificationBarLayout>
                </ProfileCard>
                <ProfileCard heading="🤖 AI Settings">
                     <NotificationBarLayout heading="AI Language" description="Language for voice and chat input">
-                          <Select :options="languageOptions"/>
+                          <Select :options="languageOptions" v-model="form.ai_input_language" @change="save('ai_input_language')"/>
                     </NotificationBarLayout>
                </ProfileCard>
           </template>
      </Layout>
 </template>
 <script setup>
+import { pick } from "lodash";
 import Layout from "~/components/profile/layout.vue";
 import NotificationBarLayout from "~/components/ui/NotificationBarLayout.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";
@@ -42,6 +47,16 @@ import Select from "~/components/ui/Select.vue";
 
 const { setLabel, setDescription } = useTopBarStore();
 const {user,logout}=useAuthStore()
+const form =reactive({
+     ...pick(user,["ai_input_language",'push_notification','email_reminders','sound_alerts','default_daily_reminders_in_mins','ai_input_language']),
+})
+const save=async(key)=>{
+     try {
+          const res=await $fetch('/api/user/updateProfile',{method:"POST",body:{[key]:form[key]}})
+     } catch (error) {
+        console.error(error)
+     }
+}
 const reminderOptions=[
      {label:'15 minues',value:15},
      {label:'30 minues',value:30},

@@ -6,6 +6,7 @@ interface User {
   sound_alerts: boolean;
   email_reminders: boolean;
   push_notification: boolean;
+  ai_input_language:string,
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -20,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const isLoggedIn = computed(() => !!data.value?.user)
-
+  
   return {
     user,
     isLoggedIn,

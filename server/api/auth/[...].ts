@@ -38,7 +38,7 @@ export default NuxtAuthHandler({
                 const userService=new UserService()
                 const authUser=await userService.user(token.email)
                 if(!authUser)return {};
-                token.sessionData=pick(authUser,['default_daily_reminders_in_mins','sound_alerts','email_reminders','push_notification'])
+                token.sessionData=pick(authUser,['default_daily_reminders_in_mins','sound_alerts','email_reminders','push_notification','ai_input_language'])
             }
             return token
         }

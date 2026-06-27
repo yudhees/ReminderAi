@@ -6,6 +6,7 @@ interface UserSessionData {
     sound_alerts?: boolean;
     email_reminders?: boolean;
     push_notification?: boolean;
+    ai_input_language?:string,
 }
 declare module "next-auth" {
     interface Session {

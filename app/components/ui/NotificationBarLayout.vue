@@ -5,11 +5,13 @@
             <div class="text-xs text-slate-500 mt-0.5">{{ description }}</div>
         </div>
         <slot></slot>
-        <FormSwitch v-if="!slots.default"/>
+        <FormSwitch v-if="!slots.default" v-model="model" @change="$emit('change')"/>
     </div>
 </template>
 <script setup>
 import FormSwitch from './FormSwitch.vue';
 defineProps(['heading','description'])
 const slots=useSlots()
+const model=defineModel();
+defineEmits(['change'])
 </script>
