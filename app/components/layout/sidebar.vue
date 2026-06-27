@@ -24,8 +24,6 @@
 <script setup>
 import AppLogo from './AppLogo.vue';
 const {user}=useAuthStore()
-console.log(user);
-
 const routes = [
   { label: "🏠 Dashboard" ,to:{name:"dashboard"}},
   { label: "➕ New Reminder",to:{}},

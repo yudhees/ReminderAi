@@ -12,6 +12,4 @@
 import FormSwitch from './FormSwitch.vue';
 defineProps(['heading','description'])
 const slots=useSlots()
-console.log(slots);
-
 </script>

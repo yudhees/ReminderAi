@@ -28,6 +28,17 @@ export default defineNuxtConfig({
       title:"Reminza"
     }
   },
+  mongoose: {
+    uri: process.env.NUXT_MONGOOSE_URI,
+    options: {
+      readPreference:"primaryPreferred",
+      readConcernLevel:"majority",
+      retryWrites:true,
+      dbName:"ReminderAI",
+      autoIndex:true,
+    },
+    modelsDir: 'models',
+  },
   auth: {
     provider: {
       type: 'authjs',
@@ -35,5 +46,5 @@ export default defineNuxtConfig({
     },
     globalAppMiddleware:true,
   },
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss",'@sidebase/nuxt-auth']
+  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", '@sidebase/nuxt-auth', 'nuxt-mongoose']
 })

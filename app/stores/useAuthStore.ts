@@ -2,6 +2,10 @@ interface User {
   name: string
   email: string
   image: string
+  default_daily_reminders_in_mins: number;
+  sound_alerts: boolean;
+  email_reminders: boolean;
+  push_notification: boolean;
 }
 
 export const useAuthStore = defineStore('auth', () => {

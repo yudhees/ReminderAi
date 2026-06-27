@@ -8,7 +8,7 @@ const { user } = useAuthStore()
 const momemt = moment()
 const {setLabel,setDescription}=useTopBarStore()
 onMounted(()=>{
-   setLabel(`Good morning, ${user.name} 👋`)
+   setLabel(`Hi, ${user.name} 👋`)
    setDescription(`${ momemt.format('dddd') }, ${ momemt.format('m') } ${ momemt.date() }`)   
 })
 </script>
