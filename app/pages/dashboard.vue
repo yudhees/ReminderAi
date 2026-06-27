@@ -9,6 +9,6 @@ const momemt = moment()
 const {setLabel,setDescription}=useTopBarStore()
 onMounted(()=>{
    setLabel(`Hi, ${user.name} 👋`)
-   setDescription(`${ momemt.format('dddd') }, ${ momemt.format('m') } ${ momemt.date() }`)   
+   setDescription(`${ momemt.format('dddd') }, ${ momemt.format('MMM') } ${ momemt.date() }`)   
 })
 </script>

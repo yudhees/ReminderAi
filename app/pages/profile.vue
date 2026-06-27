@@ -39,7 +39,7 @@
      </Layout>
 </template>
 <script setup>
-import { pick } from "lodash";
+import pick from "lodash/pick.js";
 import Layout from "~/components/profile/layout.vue";
 import NotificationBarLayout from "~/components/ui/NotificationBarLayout.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";
