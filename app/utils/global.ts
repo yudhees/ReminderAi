@@ -12,3 +12,8 @@ export const success=(message:string)=>{
 export const convertToNunmberFormat=(number:number)=>{
   return new Intl.NumberFormat().format(number);
 }
+
+export const userTimezone=()=>{
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  return browserTimezone;
+}

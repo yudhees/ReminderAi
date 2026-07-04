@@ -40,6 +40,7 @@
 </template>
 <script setup>
 import pick from "lodash/pick.js";
+import moment from "moment-timezone";
 import Layout from "~/components/profile/layout.vue";
 import NotificationBarLayout from "~/components/ui/NotificationBarLayout.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";

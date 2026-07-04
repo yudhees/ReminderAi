@@ -46,5 +46,5 @@ export default defineNuxtConfig({
     },
     globalAppMiddleware:true,
   },
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", '@sidebase/nuxt-auth', 'nuxt-mongoose']
+  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", '@sidebase/nuxt-auth', 'nuxt-mongoose', '@vueuse/nuxt']
 })
