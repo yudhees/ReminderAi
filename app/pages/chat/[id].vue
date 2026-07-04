@@ -14,8 +14,11 @@
             <AiResponse :is-loading="chatResponse.isLoading" :chat="chatResponse.message" :time="chatResponse.time" v-if="chatResponse.type=='ai'"/>
             <ChatUser :chat="chatResponse.message" :time="chatResponse.time" v-else/>
         </template>
-         <ChatInput :chat-send="chatSend" :send-chat-disabled="sendChatDisabled" v-model="chatInput" @send="sendChat" :is-new="false"/>
+        <div class="sticky bottom-0">
+            <ChatInput :chat-send="chatSend" :send-chat-disabled="sendChatDisabled" v-model="chatInput" @send="sendChat" :is-new="false"/>
+        </div>
     </template>
+    <div ref="bottomEl"></div>
 </template>
 <script setup>
 import AiResponse from '~/components/ui/AiResponse.vue';
@@ -26,7 +29,7 @@ import TopBarChatBtns from '~/components/ui/TopBarChatBtns.vue';
 import init from '~/composables/chat';
 
 const { setDescription, setLabel } = useTopBarStore()
-const {chatSend,chatInput,isNew,sendChat,sendChatDisabled,chatResponses}=init()
+const {chatSend,chatInput,isNew,sendChat,sendChatDisabled,chatResponses,bottomEl}=init()
 onMounted(() => {
     setLabel('✨ Create New Reminder')
     setDescription('')
