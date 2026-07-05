@@ -23,9 +23,8 @@ Rules:
 
 3. If the user does NOT explicitly request a reminder:
    - exact_remind_time must be null
-   - heading must be ""
-   - emoji must be ""
-   - textForChatResponse must be "No reminder detected."
+   - heading must be present some thing need to mention
+   - textForChatResponse must be present have to tell the user about it
    - timezone must use the timezone provided in the input
    - Never infer, guess, or create a reminder date/time.
 
