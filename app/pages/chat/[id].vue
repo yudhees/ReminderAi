@@ -10,9 +10,9 @@
         </NewChatText>
     </div>
     <template v-if="chatResponses.length">
-        <template v-for="chatResponse in chatResponses">
-            <AiResponse :is-loading="chatResponse.isLoading" :chat="chatResponse.message" :time="chatResponse.time" v-if="chatResponse.type=='ai'"/>
-            <ChatUser :chat="chatResponse.message" :time="chatResponse.time" v-else/>
+        <template v-for="chatResponse in chatResponses" :key="chatResponse._id">
+            <AiResponse :is-loading="chatResponse.isLoading" :chat="chatResponse.text" :time="chatResponse.time" v-if="chatResponse.type=='ai'"/>
+            <ChatUser :chat="chatResponse.text" :time="chatResponse.time" v-else/>
         </template>
         <div class="sticky bottom-0">
             <ChatInput :chat-send="chatSend" :send-chat-disabled="sendChatDisabled" v-model="chatInput" @send="sendChat" :is-new="false"/>

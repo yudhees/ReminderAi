@@ -7,9 +7,8 @@ export default defineEventHandler(async (event) => {
     const chatService = new ChatService()
     const authuser = new AuthSerive(event)
     const user = await authuser.user() as UserDocument
-    const res = await chatService.interaction(payload,String(user._id))
+    const session=await chatService.sessionDetails(String(user._id),payload.sessionId)
     return {
-        success: true,
-        ...res
+        success: Boolean(session),
     }
 })

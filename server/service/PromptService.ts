@@ -78,7 +78,26 @@ Rules:
             properties: {
                 heading: {
                     type: "string",
-                    description: "Short reminder title."
+                    description: `Generate a short reminder heading from the user's request.
+                    Rules:
+                    - Do not use generic headings such as "Reminder", "Reminder Set", or "New Reminder".
+                    - Keep it under 6 words.
+                    - Preserve the main task/event from the user's message.
+                    - Do not include the reminder time unless it is part of the task.
+                    - Use title case.
+                    
+                    Examples:
+                    User: "Set reminder after 20 min for my birthday"
+                    Heading: "Birthday Reminder"
+                    
+                    User: "Remind me to call John tomorrow at 10 AM"
+                    Heading: "Call John"
+                    
+                    User: "Remind me to pay electricity bill on Friday"
+                    Heading: "Pay Electricity Bill"
+                    
+                    User: "Set a reminder to take medicine in 2 hours"
+                    Heading: "Take Medicine"`
                 },
                 exact_remind_time: {
                     type: "string",

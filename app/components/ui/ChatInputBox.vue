@@ -6,19 +6,24 @@
 const input = defineModel();
 const textArea = ref(null);
 onMounted(() => {
- toggleTextAreaFocus()
+  toggleTextAreaFocus()
 });
-const toggleTextAreaFocus=()=>{
+const toggleTextAreaFocus = () => {
   nextTick(() => {
     textArea.value.focus();
   });
 }
+onKeyStroke('Enter', (e) => {
+  if (e.shiftKey) {
+    return 
+  }
+  e.preventDefault()
+}, { target: textArea })
 onKeyStroke((e) => {
   if (!input.value) {
     if (/^[a-zA-Z]$/.test(e.key)) {
-      input.value=e.key
+      input.value = e.key
       toggleTextAreaFocus()
-      console.log(input.value);
     }
   }
 });

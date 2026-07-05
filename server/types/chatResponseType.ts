@@ -6,3 +6,8 @@ interface ChatResponse{
     textForChatResponse:string,
     timezone:string
 }
+type InteractionPayload = {
+  sessionId: string
+  input: string
+  timezone: string
+}
