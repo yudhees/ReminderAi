@@ -25,7 +25,7 @@ definePageMeta({
     layout: "auth",
     auth: {
         unauthenticatedOnly:true,
-        navigateAuthenticatedTo:"/dashboard"
+        navigateAuthenticatedTo:"/chat/new"
     },
 })
 

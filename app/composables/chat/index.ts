@@ -33,19 +33,20 @@ export default function init() {
         }
     }
     const loadChat = async () => {
-        const res: (Pick<ChatReponseType, "type" | "text"> & {
+        const res = await $fetch<(Pick<ChatReponseType, "type" | "text"|"_id"> & {
             created_at: string
-        })[] = await $fetch('/api/chat/loadChats', {
+        })[]>('/api/chat/loadChats', {
             method: "POST",
             body: { sessionId: sessionId.value }
         })
         chatResponses.value = res.map(val => {
             return {
+                _id:val._id,
                 text: val.text,
                 type: val.type,
                 time: moment(val.created_at).format('hh:mm A')
             }
-        })
+        })        
     }
     const sendChat = async () => {
         loadingChat.value = true;
@@ -71,18 +72,20 @@ export default function init() {
                 method: "post",
                 body: { input, timezone, sessionId: sessionId.value },
             })
+            //@ts-ignore
             const session = res.sessionId
-            if (isNew.value) {
-                router.replace({ name: "chat-id", params: { id: session } })
-            }
             chatResponses.value.pop()
             chatResponses.value.push({
                 type: "ai",
                 text: res.text,
                 time: res.time,
                 _id: crypto.randomUUID(),
-
+                
             })
+            if (isNew.value) {
+                const url=router.resolve({params:{id:session}})
+                replaceUrl(url.href)
+            }
         } catch (error) {
             console.error(error);
         }

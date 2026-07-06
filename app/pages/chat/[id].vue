@@ -5,7 +5,7 @@
         </Teleport>
     </ClientOnly>
     <div id="cm" class="flex-1 min-h-0 overflow-y-auto sm:p-6 flex flex-col justify-end gap-4 bg-[#0f0f15]">
-        <NewChatText v-if="!chatResponses.length">
+        <NewChatText v-if="!chatResponses.length && isNew">
              <ChatInput :chat-send="chatSend" :send-chat-disabled="sendChatDisabled" v-model="chatInput" @send="sendChat" :is-new="isNew"/>
         </NewChatText>
     </div>
