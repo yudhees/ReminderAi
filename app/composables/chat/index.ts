@@ -13,12 +13,12 @@ export default function init() {
     const router = useRouter()
     const route = useRoute()
     const chatResponses = ref<ChatReponseType[]>([])
-    const isNew = computed(() => route.params.id == 'new')
+    const isNew = computed(() => sessionId.value=='new')
     const loadingChat = ref(false)
     const sendChatDisabled = computed(() => {
         return !chatInput.value.trim() || loadingChat.value
     })
-    const sessionId = computed(() => route.params.id)
+    const sessionId=ref(route.params.id)
     const timezone = userTimezone()
     const validateSession = async () => {
         if (!isNew.value) {
@@ -86,6 +86,7 @@ export default function init() {
                 const url=router.resolve({params:{id:session}})
                 replaceUrl(url.href)
             }
+            sessionId.value=session
         } catch (error) {
             console.error(error);
         }
