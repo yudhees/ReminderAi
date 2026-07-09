@@ -28,7 +28,11 @@ export default function init() {
             if (!res.success) {
                 router.replace({ name: "chat-id", params: { id: 'new' } })
             } else {
-                loadChat()
+                loadChat().then(()=>{
+                    nextTick(()=>{
+                        scrollDown()
+                    })
+                })
             }
         }
     }
