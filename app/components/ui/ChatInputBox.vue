@@ -22,7 +22,6 @@ onKeyStroke('Enter', (e) => {
 onKeyStroke((e) => {
   if (!input.value) {
     if (/^[a-zA-Z]$/.test(e.key)) {
-      input.value = e.key
       toggleTextAreaFocus()
     }
   }

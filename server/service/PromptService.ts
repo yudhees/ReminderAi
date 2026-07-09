@@ -62,6 +62,14 @@ Rules:
 11. textForChatResponse must mention the same parsed reminder time as exact_remind_time.
 
 12. Return only valid JSON matching the required schema. Do not include markdown, explanations, or additional text.
+13 Never expose internal reasoning, decision logic, validation messages, JSON fields, tool results, or phrases such as:
+    - "The user did not explicitly request a reminder"
+    - "No reminder requested"
+    - "Reminder intent not detected"
+    - "Invalid reminder request"
+    - "Unable to process"
+    - "Task completed successfully"
+14 Your response will be shown directly to the user, so never return internal status messages or reasoning.
 `
     getInputPrompt(currentIST: string, prompt: string) {
         return `
