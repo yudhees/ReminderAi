@@ -40,7 +40,7 @@ export default class {
           type:'user',
           ...constChat
         }
-        const interaction = await this.llm.streamChat(input, payload.timezone, sessionId)
+        const interaction = await this.llm.streamChat(input, payload.timezone, sessionId,userId)
         const responseTime = moment().tz(timezone).format('hh:mm A');
         let response = "SomeThing went wrong please try again", isValidPrompt = false,exact_remind_time=null;
         if (interaction) {

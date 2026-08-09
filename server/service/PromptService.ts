@@ -23,7 +23,7 @@ Rules:
 
 3. If the user does NOT explicitly request a reminder:
    - exact_remind_time must be null
-   - heading must be present some thing need to mention
+   - heading must be A short title describing the task (2-5 words)
    - textForChatResponse must be present have to tell the user about it
    - timezone must use the timezone provided in the input
    - Never infer, guess, or create a reminder date/time.
@@ -70,6 +70,7 @@ Rules:
     - "Unable to process"
     - "Task completed successfully"
 14 Your response will be shown directly to the user, so never return internal status messages or reasoning.
+15 If the user asked time is past based on the timezone, then set the reminder for same time to next date
 `
     getInputPrompt(currentIST: string, prompt: string) {
         return `
@@ -81,31 +82,13 @@ Rules:
             `
     }
     getSchema(timezone: string) {
-        const inputjsonSchema = {
+        const outputJsonSchema = {
             type: "object",
             properties: {
                 heading: {
                     type: "string",
-                    description: `Generate a short reminder heading from the user's request.
-                    Rules:
-                    - Do not use generic headings such as "Reminder", "Reminder Set", or "New Reminder".
-                    - Keep it under 6 words.
-                    - Preserve the main task/event from the user's message.
-                    - Do not include the reminder time unless it is part of the task.
-                    - Use title case.
-                    
-                    Examples:
-                    User: "Set reminder after 20 min for my birthday"
-                    Heading: "Birthday Reminder"
-                    
-                    User: "Remind me to call John tomorrow at 10 AM"
-                    Heading: "Call John"
-                    
-                    User: "Remind me to pay electricity bill on Friday"
-                    Heading: "Pay Electricity Bill"
-                    
-                    User: "Set a reminder to take medicine in 2 hours"
-                    Heading: "Take Medicine"`
+                    description: "A short title describing the task (2-5 words)",
+                    maxLength: 200,
                 },
                 exact_remind_time: {
                     type: "string",
@@ -121,7 +104,8 @@ Rules:
                     description: "True only when the user clearly requests a reminder and exact_remind_time is a valid future datetime. False when no reminder time is provided, the time is unclear, or the time is in the past. MUST CHECK THE PROMPT CONTAINS REMINDER TIME AND THE TIME MUST BE ON FUTURE"
                 },
                 textForChatResponse: {
-                    type: "string"
+                    type: "string",
+                    maxLength: 200,
                 }
             },
             required: [
@@ -129,9 +113,39 @@ Rules:
                 "exact_remind_time",
                 "timezone",
                 "isValidPrompt",
-                "textForChatResponse"
+                "textForChatResponse",
             ]
         }
-        return inputjsonSchema
+        return outputJsonSchema
+    }
+    getZodOutputSchema() {
+        const outputSchema = z.object({
+            heading: z
+                .string()
+                .max(200)
+                .describe("A short title describing the task (2-5 words)"),
+
+            exact_remind_time: z
+                .string()
+                .nullable()
+                .describe(
+                    "ISO datetime only for an explicit reminder request. Otherwise null."
+                ),
+
+            timezone: z
+                .string()
+                .describe(`IANA timezone`),
+
+            isValidPrompt: z
+                .boolean()
+                .describe(
+                    "True only when the user clearly requests a reminder and exact_remind_time is a valid future datetime. False when no reminder time is provided, the time is unclear, or the time is in the past. MUST CHECK THE PROMPT CONTAINS REMINDER TIME AND THE TIME MUST BE IN THE FUTURE."
+                ),
+
+            textForChatResponse: z
+                .string()
+                .max(200),
+        });
+        return outputSchema
     }
 }
