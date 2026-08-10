@@ -12,7 +12,8 @@ export default class AgentService extends PromptService {
         super()
         this.chatModel = new ChatGroq({
             apiKey: process.env.GROQ_API_KEY,
-            model: "openai/gpt-oss-120b",
+            model: "openai/gpt-oss-20b",
+            temperature:1,
         });
         const client = new MongoClient(process.env.NUXT_MONGOOSE_URI as string);
         this.checkpointer = new MongoDBSaver({ client,dbName:"ReminderAI"});
@@ -33,12 +34,11 @@ export default class AgentService extends PromptService {
 
             const agent = this.getAgent()
             const res = await agent.invoke({ messages: [{ role: "user", content: message }] }, { configurable: { thread_id, user_id } })
-            const last = res.messages.at(-1);
-            if (last?.content) {
-                const content = last.content
-                return JSON.parse(content) as ChatResponse
+            if (res?.structuredResponse) {
+                return res.structuredResponse as ChatResponse
             }
         } catch (error) {
+            console.error(error);
         }
         return null
     }
