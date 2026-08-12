@@ -11,6 +11,7 @@
           'bg-[#1c1c38] text-violet-300 font-semibold':false
         }">
         {{ route.label }}</NuxtLink>
+        <ChatSideBar/>
     </nav>
     <router-link :to="{name:'profile'}" class="block mt-auto px-4 py-3.5 border-t border-white/5 flex items-center gap-2.5">
       <img :src="user.image"  class="w-8.5 h-8.5 w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"/>
@@ -23,6 +24,7 @@
 </template>
 <script setup>
 import AppLogo from './AppLogo.vue';
+import ChatSideBar from './ChatSideBar.vue';
 const {user}=useAuthStore()
 const routes = [
   { label: "🏠 Dashboard" ,to:{name:"dashboard"}},
