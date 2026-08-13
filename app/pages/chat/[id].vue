@@ -27,11 +27,5 @@ import ChatUser from '~/components/ui/ChatUser.vue';
 import NewChatText from '~/components/ui/NewChatText.vue';
 import TopBarChatBtns from '~/components/ui/TopBarChatBtns.vue';
 import init from '~/composables/chat';
-
-const { setDescription, setLabel } = useTopBarStore()
 const {chatSend,chatInput,isNew,sendChat,sendChatDisabled,chatResponses,bottomEl}=init()
-onMounted(() => {
-    setLabel('✨ Create New Reminder')
-    setDescription('')
-})
 </script>

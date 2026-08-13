@@ -20,6 +20,8 @@ export default function init() {
     })
     const sessionId=ref(route.params.id)
     const timezone = userTimezone()
+    const {setDescription,setLabel}=useTopBarStore()
+    const {loadSpecificChat}=useChatSideBarStore()
     const validateSession = async () => {
         if (!isNew.value) {
             const res = await $fetch('/api/chat/validateSession', {
@@ -28,6 +30,9 @@ export default function init() {
             if (!res.success) {
                 router.replace({ name: "chat-id", params: { id: 'new' } })
             } else {
+                const {session}=res
+                // setLabel(session?.heading as string)
+                setLabel(session?.heading as string)
                 loadChat().then(()=>{
                     nextTick(()=>{
                         scrollDown()
@@ -89,6 +94,8 @@ export default function init() {
             if (isNew.value) {
                 const url=router.resolve({params:{id:session}})
                 replaceUrl(url.href)
+                router.replace(url.href)
+                await loadSpecificChat(session)
             }
             sessionId.value=session
         } catch (error) {
@@ -110,5 +117,11 @@ export default function init() {
     onMounted(() => {
         validateSession()
     })
+    onMounted(() => {
+        if(isNew.value){
+            setLabel('✨ Create New Reminder')
+        }
+        setDescription('')
+    });
     return { chatSend, chatInput, isNew, sendChat, sendChatDisabled, chatResponses, bottomEl }
 }

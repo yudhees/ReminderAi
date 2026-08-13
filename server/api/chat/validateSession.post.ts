@@ -10,5 +10,6 @@ export default defineEventHandler(async (event) => {
     const session=await chatService.sessionDetails(String(user._id),payload.sessionId)
     return {
         success: Boolean(session),
+        session
     }
 })

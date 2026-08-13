@@ -12,19 +12,25 @@ export const useTopBarStore = defineStore('TopBarStore', () => {
         description.value = text
     }
     const router=useRouter()
+    const route=useRoute()
     const isRenameOpen = ref(false)
     const deleteChat = async(chatId: string) => {
         try {
             await $fetch(`/api/chat/${chatId}`,{
                 method:"DELETE"
             })
-            router.push({name:"chat-id",params:{id:'new'}})
+            if(route.name=='chat-id' && route.params.id==chatId){                
+                router.push({name:"chat-id",params:{id:'new'}})
+            }
         } catch (error) {
             console.error(error);
         }
     }
     const saveSession = async (chatId: string, update: Record<string, any>) => {
         try {
+            if(update.heading && route.name=='chat-id' && route.params.id==chatId){
+                setLabel(update.heading as string)
+            }
             await $fetch(`/api/chat/${chatId}`, {
                 body: JSON.stringify({
                     chatId,

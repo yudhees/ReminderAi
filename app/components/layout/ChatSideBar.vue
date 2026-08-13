@@ -12,52 +12,16 @@ import ChatLeftBar from './ChatLeftBar.vue';
 const el = useTemplateRef('el')
 const route=useRoute()
 const chatId=computed(()=>route.params.id)
-const paginate=reactive({
-    page:1,
-    hasMorePages:false
-})
-type ChatResonseType={
-    id:string,
-    heading:string,
-    remind_time:string,  
-}
-const {deleteChat,saveSession}=useTopBarStore()
+const {loadChats, deleteSession, saveRename } = useChatSideBarStore()
+const { chats, paginate}=storeToRefs(useChatSideBarStore())
 const {isRenameOpen}=storeToRefs(useTopBarStore())
-const chats=ref<ChatResonseType[]>([])
-const deleteSession=async(chatId:string,chatIndex:number)=>{
-    if(chats.value[chatIndex]){
-        await deleteChat(chatId)
-        chats.value.splice(chatIndex, 1)
-    }
-}
-const loadChats=async()=>{
-    try {
-        const res=await $fetch<{results:ChatResonseType[],hasMorePages:boolean}>('/api/chat/loadChatSessions',{
-            body:JSON.stringify({
-                page:paginate.page
-            }),
-            method:"POST",
-        })
-        paginate.hasMorePages=res.hasMorePages
-        chats.value=chats.value.concat(res.results)
-    } catch (error) {
-        console.error(error);
-    }
-}
-const saveRename=(chatIndex:number,text:string)=>{
-    if(chats.value[chatIndex]){
-        const chat=chats.value[chatIndex]
-        chats.value[chatIndex].heading=text
-        saveSession(chat.id,{heading:text})
-    }
-}
 useInfiniteScroll(el,
     ()=>{
         console.log('yes');
     },
     {
         canLoadMore:()=>{
-            return paginate.hasMorePages
+            return paginate.value.hasMorePages
         }
     }
 )
