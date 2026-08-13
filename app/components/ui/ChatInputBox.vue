@@ -13,14 +13,15 @@ const toggleTextAreaFocus = () => {
     textArea.value.focus();
   });
 }
+const {isRenameOpen}=storeToRefs(useTopBarStore())
 onKeyStroke('Enter', (e) => {
-  if (e.shiftKey) {
+  if (e.shiftKey || isRenameOpen.value) {
     return 
   }
   e.preventDefault()
-}, { target: textArea })
+}, { target: textArea})
 onKeyStroke((e) => {
-  if (!input.value) {
+  if (!input.value && !isRenameOpen.value) {
     if (/^[a-zA-Z]$/.test(e.key)) {
       toggleTextAreaFocus()
     }

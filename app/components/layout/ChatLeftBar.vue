@@ -41,7 +41,7 @@
                             class="flex w-full items-center rounded-md px-2 py-1.5 text-left text-sm text-slate-200 transition hover:bg-[#1c1c38]">
                             Rename
                         </button>
-                        <button type="button"
+                        <button type="button" @click="$emit('delete')"
                             class="flex w-full items-center rounded-md px-2 py-1.5 text-left text-sm text-red-300 transition hover:bg-red-500/10">
                             Delete
                         </button>
@@ -65,7 +65,7 @@ const props = defineProps({
     remind_time: { default: "" }
 })
 
-const emit = defineEmits(['rename'])
+const emit = defineEmits(['rename','isRenameOpen','delete'])
 
 const isMenuOpen = ref(false)
 const menuRef = ref(null)
@@ -94,7 +94,12 @@ const formattedTime = computed(() => {
     }
 })
 
+const closeRename=()=>{
+    emit("isRenameOpen",false)
+    isRename.value=false
+}
 const startRename = () => {
+    emit("isRenameOpen",true)
     editedName.value = props.heading
     isRename.value = true
     isMenuOpen.value = false
@@ -109,14 +114,14 @@ const startRename = () => {
 
 const saveRename = () => {
     if (editedName.value.trim() && editedName.value !== props.heading) {
-        emit('rename', { chatId: props.chatId, newName: editedName.value.trim() })
+        emit('rename',editedName.value.trim() )
     }
-    isRename.value = false
+    closeRename()
 }
 
 const cancelRename = () => {
     editedName.value = props.heading
-    isRename.value = false
+    closeRename()
 }
 
 const toggleMenu = () => {

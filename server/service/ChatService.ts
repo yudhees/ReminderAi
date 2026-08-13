@@ -2,6 +2,8 @@ import { LLmService } from "./LLmService";
 import { ChatSession } from "../models/ChatSession";
 import moment from "moment-timezone";
 import { ChatHistory } from "../models/ChatHistory";
+import { CheckPointWrites } from "../models/CheckPointWrites";
+import { Checkpoints } from "../models/CheckPoints";
 export default class {
 
     public llm: LLmService;
@@ -19,6 +21,24 @@ export default class {
     async getChats(sessionId:string){
         const chats=await ChatHistory.find({sessionId},{type:1,text:1,created_at:1},{sort:{created_at:1}})
         return chats
+    }
+    async saveSessionDetail(sessionId:string,update:Record<string,any>){
+        try {
+            await ChatSession.updateOne({_id:sessionId},{$set:update})
+        } catch (error) {
+            return null;
+        }
+    }
+    async deleteChat(sessionId:string){
+        try {
+            await ChatHistory.deleteMany({sessionId})
+            await CheckPointWrites.deleteMany({thread_id:sessionId})
+            await Checkpoints.deleteMany({thread_id:sessionId})
+            await ChatSession.deleteOne({_id:sessionId})
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
     }
     async interaction(payload: InteractionPayload,userId:string) {
         let { sessionId, input, timezone } = payload

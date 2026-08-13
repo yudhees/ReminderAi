@@ -8,7 +8,7 @@
         <ChatSendBtn ref="chatSend" :disable-chat-send="sendChatDisabled" @send="$emit('send')"/>
       </div>
       <div class="flex gap-1.5 mt-2.5 flex-wrap" v-if="!isNew">
-        <ChatInputHelpBtn>
+        <!-- <ChatInputHelpBtn>
           💤 Snooze 1hr
         </ChatInputHelpBtn>
         <ChatInputHelpBtn>
@@ -19,7 +19,7 @@
         </ChatInputHelpBtn>
         <ChatInputHelpBtn>
           🕐 Check time
-        </ChatInputHelpBtn>
+        </ChatInputHelpBtn> -->
       </div>
     </div>
   </ClientOnly>
