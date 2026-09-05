@@ -18,7 +18,8 @@
                     </div>
                </ProfileCard>
                <ProfileCard heading="🔔 Notifications">
-                    <NotificationBarLayout heading="Push Notifications" description="Receive alerts in browser" v-model="form.push_notification" 
+                    <NotificationBarLayout heading="Push Notifications" description="Receive alerts in browser"
+                    v-model="form.push_notification" 
                     @change="save('push_notification')"/>
                     <!-- <NotificationBarLayout heading="Email Reminders" description="Backup alerts to your email" v-model="form.email_reminders"
                     @change="save('email_reminders')"
@@ -61,7 +62,7 @@ import NotificationBarLayout from "~/components/ui/NotificationBarLayout.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";
 import Select from "~/components/ui/Select.vue";
 import { useWebNotification } from '@vueuse/core'
-const {isSupported,show}=useWebNotification({title:"test"})
+const {isSupported,show}=useWebNotification()
 console.log(isSupported.value);
 const { setLabel, setDescription } = useTopBarStore();
 const {user,logout}=useAuthStore()
@@ -109,5 +110,6 @@ const playSound = (file) => {
 onMounted(() => {
      setLabel("⚙️ Settings");
      setDescription("");
+     show({title:"test"})
 });
 </script>
