@@ -62,9 +62,8 @@ import NotificationBarLayout from "~/components/ui/NotificationBarLayout.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";
 import Select from "~/components/ui/Select.vue";
 import { useWebNotification } from '@vueuse/core'
-const {show}=useWebNotification()
-const {isSupported} =usePushNotifications()
-console.log(isSupported.value,"yes");
+const {isSupported,permissionGranted,show}=useWebNotification()
+console.log(isSupported.value,permissionGranted.value,"yes");
 
 const { setLabel, setDescription } = useTopBarStore();
 const {user,logout}=useAuthStore()
