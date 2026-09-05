@@ -62,8 +62,8 @@ import NotificationBarLayout from "~/components/ui/NotificationBarLayout.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";
 import Select from "~/components/ui/Select.vue";
 import { useWebNotification } from '@vueuse/core'
-const {isSupported,show}=useWebNotification()
-console.log(isSupported.value);
+const {show}=useWebNotification()
+const {isSupported} =usePushNotifications()
 const { setLabel, setDescription } = useTopBarStore();
 const {user,logout}=useAuthStore()
 const form =reactive({
