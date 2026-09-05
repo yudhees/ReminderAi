@@ -22,6 +22,7 @@ export default class UserService{
                     push_notification:true,
                     email_reminders:false,
                     sound_alerts:true,
+                    notification_sound:"alarm",
                     default_daily_reminders_in_mins:15,
                     ai_input_language:"en-US"
                 }

@@ -90,7 +90,7 @@ const formattedTime = computed(() => {
     } else if (reminderDate.isSame(now.clone().add(1, 'day'), 'day')) {
         return `Tomorrow ${reminderDate.format('h:mm A')}`
     } else {
-        return reminderDate.format('MM-DD-YY')
+        return reminderDate.format('DD MMM YY')
     }
 })
 

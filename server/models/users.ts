@@ -16,6 +16,7 @@ export const User = defineModel("users", {
         required: true,
         unique: true,
     },
+    notification_sound:{type:String},
 })
 
 

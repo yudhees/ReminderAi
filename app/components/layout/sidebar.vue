@@ -29,7 +29,7 @@ const {user}=useAuthStore()
 const routes = [
   { label: "🏠 Dashboard" ,to:{name:"dashboard"}},
   { label: "➕ New Reminder",to:{name:"chat-id",params:{id:'new'}}},
-  { label: "📋 All Reminders",to:{}},
+  { label: "📋 All Reminders",to:{name:"all-reminders"}},
   { label: "🔔 Notifications",to:{}},
   { label: "⚙️ Settings", to:{name:"profile"}},
 ]

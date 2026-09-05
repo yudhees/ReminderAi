@@ -28,5 +28,4 @@ definePageMeta({
         navigateAuthenticatedTo:"/chat/new"
     },
 })
-
 </script>

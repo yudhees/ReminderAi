@@ -17,6 +17,9 @@
             <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end sm:gap-2.5" id="topBarBtns">
                 <template  v-if="isDefaultTopBarBtns">
                     <button
+                        class="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/5 bg-[#1c1c2a] px-3.5 py-2 text-[13px] text-slate-400 hover:bg-[#2a2a3e] sm:flex-none" @click="enablePush">
+                        Enable Notifcation</button>
+                    <button
                         class="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/5 bg-[#1c1c2a] px-3.5 py-2 text-[13px] text-slate-400 hover:bg-[#2a2a3e] sm:flex-none">🎤
                         Voice</button>
                     <button
@@ -38,4 +41,25 @@ const { user } = useAuthStore()
 const { description, label } = storeToRefs(useTopBarStore())
 const route=useRoute()
 const isDefaultTopBarBtns=computed(()=>!(['chat-id']).includes(route.name))
+const {
+  isSupported,
+  enableNotifications
+} = usePushNotifications()
+
+const loading = ref(false)
+const enabled = ref(false)
+
+async function enablePush() {
+  try {
+    loading.value = true
+
+    await enableNotifications()
+
+    enabled.value = true
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
+}
 </script>

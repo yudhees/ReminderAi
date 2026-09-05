@@ -116,12 +116,10 @@ export default function init() {
     })
     onMounted(() => {
         validateSession()
-    })
-    onMounted(() => {
         if(isNew.value){
             setLabel('✨ Create New Reminder')
         }
         setDescription('')
-    });
+    })
     return { chatSend, chatInput, isNew, sendChat, sendChatDisabled, chatResponses, bottomEl }
 }
