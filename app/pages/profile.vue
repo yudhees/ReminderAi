@@ -64,6 +64,8 @@ import Select from "~/components/ui/Select.vue";
 import { useWebNotification } from '@vueuse/core'
 const {show}=useWebNotification()
 const {isSupported} =usePushNotifications()
+console.log(isSupported.value,"yes");
+
 const { setLabel, setDescription } = useTopBarStore();
 const {user,logout}=useAuthStore()
 const form =reactive({
