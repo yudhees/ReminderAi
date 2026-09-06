@@ -19,7 +19,7 @@
                </ProfileCard>
                <ProfileCard heading="🔔 Notifications">
                     <NotificationBarLayout heading="Push Notifications" description="Receive alerts in browser">
-                        <FormSwitch  :checked="isSupported" @change="enableNotifications"  :disabled="isSupported"/>
+                        <FormSwitch  :checked="isSupported" @change="enableNotifications" :disabled="isSupported"/>
                    </NotificationBarLayout>
                     <!-- <NotificationBarLayout heading="Email Reminders" description="Backup alerts to your email" v-model="form.email_reminders"
                     @change="save('email_reminders')"

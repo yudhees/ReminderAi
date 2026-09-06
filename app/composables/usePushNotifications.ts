@@ -6,19 +6,19 @@ export function usePushNotifications() {
   const isSupported = computed(() =>isSupportedWeb.value && permissionGranted.value)
 
   async function enableNotifications() {
-    if (!isSupported.value) {
-      throw new Error(
-        'Push notifications are not supported'
-      )
+    if (!isSupportedWeb.value) {
+      const text="Push notifications are not supported"
+      alert(text)
+      throw new Error(text)
     }
 
     const permission =
       await Notification.requestPermission()
 
     if (permission !== 'granted') {
-      throw new Error(
-        'Notification permission denied'
-      )
+      const text="Notification permission denied"
+      alert(text)
+      throw new Error(text)
     }
 
     const registration =
