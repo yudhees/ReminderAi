@@ -1,18 +1,9 @@
 
 export function usePushNotifications() {
   const config = useRuntimeConfig()
+ const {isSupported:isSupportedWeb,permissionGranted}=useWebNotification()
 
-  const isSupported = computed(() => {
-    if (!import.meta.client) {
-      return false
-    }
-
-    return (
-      'serviceWorker' in navigator &&
-      'PushManager' in window &&
-      'Notification' in window
-    )
-  })
+  const isSupported = computed(() =>isSupportedWeb.value && permissionGranted.value)
 
   async function enableNotifications() {
     if (!isSupported.value) {

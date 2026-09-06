@@ -6,10 +6,21 @@
     </div>
 </template>
 <script setup>
+const props=defineProps(['checked','disabled'])
 const check = defineModel();
 const emit = defineEmits([ 'change'])
 const toggle = () => {
+    if(props.disabled)return;
     check.value = !check.value
     emit("change")
 }
+const updateChecked=()=>{
+    check.value=props.checked||false
+}
+watch(()=>props.checked,()=>{
+    updateChecked()
+})
+onMounted(()=>{
+    updateChecked()
+})
 </script>
