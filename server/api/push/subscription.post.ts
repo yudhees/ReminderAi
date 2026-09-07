@@ -18,12 +18,12 @@ export default defineEventHandler(async (event) => {
 
   // Get your logged-in user here
   const authUser = await getAuthUser(event) as UserDocument
-  await Subscription.updateOne(
-    { userId: authUser.id, endpoint: subscription.endpoint, p256dh: subscription.keys.p256dh, auth: subscription.keys.auth },
-    { $set: {} },
-    { upsert: true }
+  const data=await Subscription.findOne(
+    { userId: authUser.id, endpoint: subscription.endpoint },
+    {endpoint:1,_id:1}
   )
   return {
-    success: true
+    success: true,
+    subscriptionExists:Boolean(data)
   }
 })

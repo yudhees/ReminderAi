@@ -19,7 +19,7 @@
                </ProfileCard>
                <ProfileCard heading="🔔 Notifications">
                     <NotificationBarLayout heading="Push Notifications" description="Receive alerts in browser">
-                        <FormSwitch  :checked="isSupported" @change="enableNotifications" :disabled="isSupported"/>
+                        <FormSwitch  :checked="isSupported && hasAlreadySubscribed" @change="updateNotification"/>
                    </NotificationBarLayout>
                     <!-- <NotificationBarLayout heading="Email Reminders" description="Backup alerts to your email" v-model="form.email_reminders"
                     @change="save('email_reminders')"
@@ -56,16 +56,17 @@
 </template>
 <script setup>
 import pick from "lodash/pick.js";
-import moment from "moment-timezone";
 import Layout from "~/components/profile/layout.vue";
 import NotificationBarLayout from "~/components/ui/NotificationBarLayout.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";
 import Select from "~/components/ui/Select.vue";
-import { useWebNotification } from '@vueuse/core'
 import FormSwitch from "~/components/ui/FormSwitch.vue";
-const {isSupported,enableNotifications}=usePushNotifications()
+const {isSupported,enableNotifications,unregister,hasAlreadySubscribed}=usePushNotifications()
 const { setLabel, setDescription } = useTopBarStore();
 const {user,logout}=useAuthStore()
+const updateNotification=async(checked)=>{
+   checked?await enableNotifications():unregister()
+}
 const form =reactive({
      ...pick(user,["ai_input_language",'push_notification','email_reminders','sound_alerts','default_daily_reminders_in_mins','notification_sound']),
 })

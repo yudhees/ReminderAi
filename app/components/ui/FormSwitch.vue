@@ -12,7 +12,7 @@ const emit = defineEmits([ 'change'])
 const toggle = () => {
     if(props.disabled)return;
     check.value = !check.value
-    emit("change")
+    emit("change",check.value)
 }
 const updateChecked=()=>{
     check.value=props.checked||false
