@@ -35,10 +35,6 @@ export default defineNuxtConfig({
           sizes:"80x180"
         },
         {
-          rel:"manifest",
-          href:"/site.webmanifest"
-        },
-        {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap'
         },
@@ -68,5 +64,69 @@ export default defineNuxtConfig({
     },
     globalAppMiddleware: true,
   },
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", '@sidebase/nuxt-auth', 'nuxt-mongoose', '@vueuse/nuxt','@vite-pwa/nuxt']
+  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", '@sidebase/nuxt-auth', 'nuxt-mongoose', '@vueuse/nuxt','@vite-pwa/nuxt'],
+  pwa: {
+    register: true,
+    strategies: 'generateSW',
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+      runtimeCaching: [
+        {
+          urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'google-fonts-cache',
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+            },
+            cacheableResponse: {
+              statuses: [0, 200]
+            }
+          }
+        },
+        {
+          urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'gstatic-fonts-cache',
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+            },
+            cacheableResponse: {
+              statuses: [0, 200]
+            }
+          }
+        }
+      ]
+    },
+    manifest: {
+      name: 'Reminza - AI Reminders',
+      short_name: 'Reminza',
+      description: 'Easy AI-powered reminders',
+      theme_color: '#0f0f15',
+      background_color: '#0f0f15',
+      display: 'standalone',
+      orientation: 'portrait',
+      icons: [
+        {
+          src: '/icons/web-app-manifest-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'any maskable'
+        },
+        {
+          src: '/icons/web-app-manifest-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable'
+        }
+      ]
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module'
+    }
+  }
 })
