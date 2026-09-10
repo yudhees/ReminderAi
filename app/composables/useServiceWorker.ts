@@ -9,31 +9,22 @@ export const useServiceWorker = () => {
     }
 
     const getRegistration = async () => {
-        // Check if we're in browser context
-        if (process.client && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-            try {
-                // First try to get existing service worker
-                const existingRegistration = await navigator.serviceWorker.getRegistration()
-                if (existingRegistration) {
-                    return existingRegistration
-                }
-
-                // Register the push-specific service worker
-                const pushSWRegistration = await navigator.serviceWorker.register(
-                    '/push-sw.js',
-                    { scope: '/' }
-                )
-                console.log('Push service worker registered:', pushSWRegistration)
-                return pushSWRegistration
-            } catch (error) {
-                console.error('Push service worker registration failed:', error)
-                // Fallback to PWA service worker
-                if (nuxtApp.$pwa?.swReady) {
-                    return await nuxtApp.$pwa.swReady
-                }
+        try {
+            // Fallback to manual registration
+            const existingRegistration = await navigator.serviceWorker.getRegistration()
+            if (existingRegistration) {
+                return existingRegistration
             }
+
+            // Register the main service worker
+            const swRegistration = await navigator.serviceWorker.register(
+                '/push-sw.js',
+            )
+            console.log('Service worker registered:', swRegistration)
+            return swRegistration
+        } catch (error) {
+            console.error('Service worker registration failed:', error)
         }
-        return null
     }
 
     const browserSubscriptionDetails = async () => {
