@@ -1,67 +1,58 @@
-importScripts(
-  'https://storage.googleapis.com/workbox-cdn/releases/7.3.0/workbox-sw.js'
-)
-
-const { clientsClaim } = workbox.core
-
-const {
-  cleanupOutdatedCaches
-} = workbox.precaching
-
-const {
-  registerRoute
-} = workbox.routing
-
-cleanupOutdatedCaches()
-
-self.skipWaiting()
-clientsClaim()
-
-
-// Push notification
 self.addEventListener('push', (event) => {
-  let data = {}
+    console.log('[SW] PUSH RECEIVED')
 
-  try {
-    data = event.data ? event.data.json() : {}
-  } catch (error) {
-    console.error('Failed to parse push data:', error)
-  }
+    event.waitUntil(
+        (async () => {
+            let data = {}
 
-  event.waitUntil(
-    self.registration.showNotification(
-      data.title || 'Notification',
-      {
-        body: data.body || '',
-        tag: 'Reminder',
-        requireInteraction: true,
-        vibrate: [200, 100, 200],
-        renotify: true,
-        icon: '/icons/web-app-manifest-192x192.png',
-        badge: '/icons/favicon.png'
-      }
+            try {
+                if (event.data) {
+                    data = event.data.json()
+                }
+            } catch (error) {
+                console.error('[SW] JSON parse error:', error)
+
+                data = {
+                    title: 'Reminza',
+                    body: event.data?.text() || ''
+                }
+            }
+
+            console.log('[SW] DATA:', data)
+
+            try {
+                await self.registration.showNotification(
+                    data.title || 'Notification',
+                    {
+                        body: data.body || 'Test notification'
+                    }
+                )
+
+                console.log('[SW] NOTIFICATION SUCCESS')
+            } catch (error) {
+                console.error('[SW] NOTIFICATION FAILED:', error)
+                throw error
+            }
+        })()
     )
-  )
 })
 
 
-// Notification click
 self.addEventListener('notificationclick', (event) => {
-  event.notification.close()
+    event.notification.close()
 
-  event.waitUntil(
-    clients.matchAll({
-      type: 'window',
-      includeUncontrolled: true
-    }).then((windowClients) => {
+    event.waitUntil(
+        clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true
+        }).then((windowClients) => {
+            for (const client of windowClients) {
+                if (client.url.startsWith(self.location.origin)) {
+                    return client.focus()
+                }
+            }
 
-      for (const client of windowClients) {
-        if ('focus' in client) {
-          return client.focus()
-        }
-      }
-
-      return clients.openWindow('/')
-    })
-  )
+            return clients.openWindow('/')
+        })
+    )
 })
