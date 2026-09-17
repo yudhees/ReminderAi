@@ -8,7 +8,8 @@ export default defineNuxtRouteMiddleware((to) => {
     '/site.webmanifest',
     '/_nuxt/sw.js',
     '/_nuxt/workbox-',
-    '/dev-sw-dist'
+    '/dev-sw-dist',
+    '/push-sw-dist'
   ]
 
   const shouldSkip = skipPaths.some(path => to.path.startsWith(path)) ||

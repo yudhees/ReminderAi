@@ -10,16 +10,27 @@ export const useServiceWorker = () => {
 
     const getRegistration = async () => {
         try {
+            // Use the PWA service worker (now handles both caching and push)
+            // if (nuxtApp.$pwa?.swReady) {
+            //     return await nuxtApp.$pwa.swReady
+            // }
+
             // Fallback to manual registration
-            const existingRegistration = await navigator.serviceWorker.getRegistration()
-            if (existingRegistration) {
+            const existingRegistration =
+                await navigator.serviceWorker.getRegistration('/')
+
+            if (
+                existingRegistration &&
+                existingRegistration.active?.scriptURL.endsWith('/sw.js')
+            ) {
                 return existingRegistration
             }
 
-            // Register the main service worker
-            const swRegistration = await navigator.serviceWorker.register(
-                '/push-sw.js',
-            )
+            const swRegistration =
+                await navigator.serviceWorker.register('/sw.js', {
+                    scope: '/',
+                })
+
             console.log('Service worker registered:', swRegistration)
             return swRegistration
         } catch (error) {
