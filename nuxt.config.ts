@@ -67,7 +67,8 @@ export default defineNuxtConfig({
   modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", '@sidebase/nuxt-auth', 'nuxt-mongoose', '@vueuse/nuxt','@vite-pwa/nuxt'],
   pwa: {
     register: true,
-    strategies: 'generateSW',
+    registerType: 'autoUpdate',
+    strategies: 'injectManifest',
     writeMode: true,
     filename: 'sw.js',
     manifest: {
