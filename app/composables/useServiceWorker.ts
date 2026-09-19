@@ -26,13 +26,13 @@ export const useServiceWorker = () => {
                 return existingRegistration
             }
 
-            const swRegistration =
-                await navigator.serviceWorker.register('/sw.js', {
-                    scope: '/',
-                })
+            // const swRegistration =
+            //     await navigator.serviceWorker.register('/sw.js', {
+            //         scope: '/',
+            //     })
 
-            console.log('Service worker registered:', swRegistration)
-            return swRegistration
+            // console.log('Service worker registered:', swRegistration)
+            // return swRegistration
         } catch (error) {
             console.error('Service worker registration failed:', error)
         }
