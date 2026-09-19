@@ -1,3 +1,11 @@
+self.addEventListener('install', () => {
+    console.log('[SW] INSTALL')
+})
+
+self.addEventListener('activate', () => {
+    console.log('[SW] ACTIVATE')
+})
+
 self.addEventListener('push', (event) => {
     console.log('[SW] PUSH RECEIVED')
 
