@@ -17,15 +17,15 @@ export const useServiceWorker = () => {
 
             // Fallback to manual registration
             const existingRegistration =
-                await navigator.serviceWorker.getRegistration('/')
-
+                await navigator.serviceWorker.getRegistration('/')       
+            console.log(existingRegistration?.active?.scriptURL);
+                 
             if (
                 existingRegistration &&
-                existingRegistration.active?.scriptURL.endsWith('/sw.js')
+                existingRegistration.active?.scriptURL.includes('/sw.js')
             ) {
                 return existingRegistration
             }
-
             // const swRegistration =
             //     await navigator.serviceWorker.register('/sw.js', {
             //         scope: '/',
