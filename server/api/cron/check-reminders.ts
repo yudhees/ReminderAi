@@ -56,19 +56,10 @@ export default defineEventHandler(async (event) => {
                 }
             }
 
-            // Mark as sent
+            // Delete reminder after sending
             if (sentMethods.length > 0) {
-                await ChatSession.updateOne(
-                    { _id: reminder._id },
-                    {
-                        $set: {
-                            notification_sent: true,
-                            notification_sent_at: new Date(),
-                            notification_sent_via: sentMethods.join(',')
-                        }
-                    }
-                );
-                console.log(`Reminder ${reminder._id} sent via ${sentMethods.join(', ')}`);
+                await ChatSession.deleteOne({ _id: reminder._id });
+                console.log(`Reminder ${reminder._id} sent via ${sentMethods.join(', ')} and deleted`);
                 results.push({
                     reminderId: String(reminder._id),
                     sentMethods,
