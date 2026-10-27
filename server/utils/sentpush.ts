@@ -7,30 +7,41 @@ const initWebPush = () => {
     const vapidPrivateKey = config.vapidPrivateKey
     const validPublicKey = config.public.vapidPublicKey
     webpush.setVapidDetails(
-        "mailto:yudees479@gmail.com",
+        process.env.VAPID_EMAIL || "mailto:noreply@reminza.com",
         validPublicKey,
         vapidPrivateKey
     );
-
 }
-export const sendPushNotification = async () => {
+
+export const sendPushNotification = async (userId: string, title: string, body: string, reminderId: string) => {
     initWebPush()
-    const subscription = await Subscription.findOne()
-    const data =
-    {
-        "endpoint": subscription.endpoint,
-        "expirationTime": null,
-        "keys": {
-            "p256dh": subscription.p256dh,
-            "auth": subscription.auth
+    const subscriptions = await Subscription.find({ userId })
+
+    const results = []
+    for (const subscription of subscriptions) {
+        try {
+            const data = {
+                endpoint: subscription.endpoint,
+                expirationTime: null,
+                keys: {
+                    p256dh: subscription.p256dh,
+                    auth: subscription.auth
+                }
+            }
+            await webpush.sendNotification(
+                data,
+                JSON.stringify({
+                    title,
+                    body,
+                    reminderId,
+                    icon: '/icons/web-app-manifest-192x192.png'
+                })
+            );
+            results.push({ success: true, endpoint: subscription.endpoint })
+        } catch (error) {
+            console.error('Push notification failed for', subscription.endpoint, error);
+            results.push({ success: false, endpoint: subscription.endpoint, error })
         }
     }
-    await webpush.sendNotification(
-            data,
-            JSON.stringify({
-                title: "Reminder",
-                body: "Pay electricity bill",
-                reminderId: "123"
-            })
-        );
-    }
+    return results
+}

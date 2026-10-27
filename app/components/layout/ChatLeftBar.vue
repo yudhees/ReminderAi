@@ -79,10 +79,10 @@ let rafId = null
 
 const formattedTime = computed(() => {
     if (!props.remind_time) return ''
-    
+
     const reminderDate = moment(props.remind_time)
     const now = moment()
-    
+
     if (reminderDate.isSame(now, 'day')) {
         return reminderDate.format('h:mm A')
     } else if (reminderDate.isSame(now.clone().subtract(1, 'day'), 'day')) {

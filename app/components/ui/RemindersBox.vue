@@ -20,12 +20,16 @@ const props = defineProps(['reminder'])
 const label = computed(() => {
   const {reminder}=props
   const date = moment(reminder.remind_time)
-  return date.calendar(null, {
-    sameDay: '[Today] · h:mm A',
-    nextDay: '[Tomorrow] · h:mm A',
-    lastDay: '[Yesterday] · h:mm A',
-    sameElse: 'ddd · h:mm A'
-  })
+  const now = moment()
+  if (date.isSame(now, 'day')) {
+    return `Today · ${date.format('h:mm A')}`
+  } else if (date.isSame(now.clone().add(1, 'day'), 'day')) {
+    return `Tomorrow · ${date.format('h:mm A')}`
+  } else if (date.isSame(now.clone().subtract(1, 'day'), 'day')) {
+    return `Yesterday · ${date.format('h:mm A')}`
+  } else {
+    return `${date.format('ddd')} · ${date.format('h:mm A')}`
+  }
 })
 
 </script>

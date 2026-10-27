@@ -17,6 +17,15 @@ export const User = defineModel("users", {
         unique: true,
     },
     notification_sound:{type:String},
+    push_notification:{type:Boolean, default:true},
+    email_reminders:{type:Boolean, default:false},
+    sound_alerts:{type:Boolean, default:true},
+    default_daily_reminders_in_mins:{type:Number, default:15},
+    ai_input_language:{type:String, default:"en-US"},
+}, {
+    indexes: [
+        { email: 1 },
+    ],
 })
 
 

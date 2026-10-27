@@ -22,7 +22,7 @@ self.addEventListener('push', (event) => {
 
                 data = {
                     title: 'Reminza',
-                    body: event.data?.text() || ''
+                    body: event.data?.text() || 'You have a reminder'
                 }
             }
 
@@ -30,9 +30,13 @@ self.addEventListener('push', (event) => {
 
             try {
                 await self.registration.showNotification(
-                    data.title || 'Notification',
+                    data.title || 'Reminder',
                     {
-                        body: data.body || 'Test notification'
+                        body: data.body || 'You have a reminder',
+                        icon: data.icon || '/icons/web-app-manifest-192x192.png',
+                        badge: '/icons/favicon.png',
+                        tag: data.reminderId || 'reminder',
+                        requireInteraction: true,
                     }
                 )
 
