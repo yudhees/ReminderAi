@@ -4,15 +4,6 @@ import EmailService from '../../service/EmailService';
 import { sendPushNotification } from '../../utils/sentpush';
 
 export default defineEventHandler(async (event) => {
-    // Verify this is called by Vercel cron (optional security check)
-    const authHeader = getHeader(event, 'authorization');
-    if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-        throw createError({
-            statusCode: 401,
-            statusMessage: 'Unauthorized'
-        });
-    }
-
     try {
         const now = new Date();
 
