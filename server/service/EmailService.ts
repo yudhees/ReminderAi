@@ -16,6 +16,7 @@ export default class EmailService {
 
     async sendReminderEmail(userEmail: string, reminderHeading: string, remindTime: Date) {
         try {
+            
             const info = await this.transporter.sendMail({
                 from: process.env.GMAIL_EMAIL,
                 to: userEmail,
