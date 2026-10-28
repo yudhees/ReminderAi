@@ -18,7 +18,7 @@
   </button>
 </template>
 <script setup>
-defineEmits(['voice', 'send'])
+const emit = defineEmits(['voice', 'send'])
 defineProps({
   disableChatSend:{default:false}
 })
@@ -43,8 +43,10 @@ const toggleVoice = () => {
     stop()
   }
 }
-onMounted(() => {
-
+watch(result, (newResult) => {
+  if (newResult) {
+    emit('voice', newResult)
+  }
 })
 defineExpose({isListening})
 </script>

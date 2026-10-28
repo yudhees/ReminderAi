@@ -50,7 +50,7 @@ export default defineNuxtConfig({
     uri: process.env.NUXT_MONGOOSE_URI,
     options: {
       dbName: "ReminderAI",
-      readPreference: "primaryPreferred",
+      readPreference: "secondaryPreferred",
       readConcernLevel: "majority",
       retryWrites: true,
       maxPoolSize: 10,

@@ -5,7 +5,7 @@
       <div
         class="bg-[#1a1a26] border border-white/10 focus-within:border-indigo-500/40 rounded-2xl px-3.5 py-3 flex items-end gap-2.5">
         <ChatInputBox v-model="chatInput"/>
-        <ChatSendBtn ref="chatSend" :disable-chat-send="sendChatDisabled" @send="$emit('send')"/>
+        <ChatSendBtn ref="chatSend" :disable-chat-send="sendChatDisabled" @send="$emit('send')" @voice="handleVoiceInput"/>
       </div>
       <div class="flex gap-1.5 mt-2.5 flex-wrap" v-if="!isNew">
         <!-- <ChatInputHelpBtn>
@@ -31,5 +31,10 @@ import ChatSendBtn from './ChatSendBtn.vue';
 import ListingBar from './ListingBar.vue';
 defineProps(['chatSend','sendChatDisabled','isNew'])
 const chatInput=defineModel()
-defineEmits(['send'])
+const emit = defineEmits(['send'])
+const handleVoiceInput = (text) => {
+  console.log(text);
+  
+  chatInput.value = text
+}
 </script>
