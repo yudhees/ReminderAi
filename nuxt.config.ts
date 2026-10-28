@@ -14,34 +14,34 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
-         {
+        {
           rel: 'icon',
           type: 'image/png',
           href: '/icons/favicon.png',
-          sizes:"96x96"
+          sizes: "96x96"
         },
-         {
+        {
           rel: 'icon',
           type: 'image/svg+xml',
           href: '/icons/favicon.svg',
         },
-         {
+        {
           rel: 'shortcut icon',
           href: '/icons/favicon.ico',
         },
         {
           rel: 'apple-touch-icon',
           href: '/icons/apple-touch-icon.png',
-          sizes:"80x180"
+          sizes: "80x180"
         },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap'
         },
       ],
-      meta:[
-        {name:"description",content:"Easy Reminders"},
-        {name: 'apple-mobile-web-app-title',content: 'Reminder'}
+      meta: [
+        { name: "description", content: "Easy Reminders" },
+        { name: 'apple-mobile-web-app-title', content: 'Reminder' }
       ],
       title: "Reminza"
     }
@@ -49,11 +49,15 @@ export default defineNuxtConfig({
   mongoose: {
     uri: process.env.NUXT_MONGOOSE_URI,
     options: {
+      dbName: "ReminderAI",
       readPreference: "primaryPreferred",
       readConcernLevel: "majority",
       retryWrites: true,
-      dbName: "ReminderAI",
-      autoIndex: true,
+      maxPoolSize: 10,
+      minPoolSize: 0,
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 10000,
+      autoIndex: false,
     },
     modelsDir: 'models',
   },
@@ -64,7 +68,7 @@ export default defineNuxtConfig({
     },
     globalAppMiddleware: true,
   },
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", '@sidebase/nuxt-auth', 'nuxt-mongoose', '@vueuse/nuxt','@vite-pwa/nuxt'],
+  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", '@sidebase/nuxt-auth', 'nuxt-mongoose', '@vueuse/nuxt', '@vite-pwa/nuxt'],
   pwa: {
     register: true,
     registerType: 'autoUpdate',
