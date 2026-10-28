@@ -33,8 +33,6 @@ defineProps(['chatSend','sendChatDisabled','isNew'])
 const chatInput=defineModel()
 const emit = defineEmits(['send'])
 const handleVoiceInput = (text) => {
-  console.log(text);
-  
-  chatInput.value = text
+  chatInput.value = chatInput.value + text
 }
 </script>
