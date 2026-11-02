@@ -62,11 +62,12 @@ export default class {
         }
         const interaction = await this.llm.streamChat(input, payload.timezone, sessionId,userId)
         const responseTime = moment().tz(timezone).format('hh:mm A');
-        let response = "SomeThing went wrong please try again", isValidPrompt = false,exact_remind_time=null;
+        let response = "SomeThing went wrong please try again", isValidPrompt = false,exact_remind_time=null,user_specified_seconds=false;
         if (interaction) {
             isValidPrompt = interaction.isValidPrompt
             response = interaction.textForChatResponse
             exact_remind_time=interaction.exact_remind_time
+            user_specified_seconds=interaction.user_specified_seconds??false
         }
         userChat.isValidPrompt=isValidPrompt
         const aiChat={
@@ -80,7 +81,11 @@ export default class {
            sessionUpdate.heading=interaction?.heading??'Reminder - Error';
         }
         if(isValidPrompt && exact_remind_time!='null' && exact_remind_time){
-            const utcDate = moment.parseZone(exact_remind_time).utc().toDate()
+            const parsedDate = moment.parseZone(exact_remind_time)
+            if (!user_specified_seconds) {
+                parsedDate.seconds(0).milliseconds(0)
+            }
+            const utcDate = parsedDate.utc().toDate()
             sessionUpdate.remind_time=utcDate
         }
         await ChatSession.updateOne({_id:sessionId},{$set:sessionUpdate})

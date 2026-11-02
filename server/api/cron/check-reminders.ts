@@ -34,7 +34,8 @@ export default defineEventHandler(async (event) => {
                         String(user._id),
                         'Reminder',
                         reminder.heading,
-                        String(reminder._id)
+                        String(reminder._id),
+                        'alarm.mp3'
                     );
                     sentMethods.push('push');
                 } catch (error) {

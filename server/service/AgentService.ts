@@ -4,6 +4,7 @@ import { createAgent, providerStrategy, tool } from "langchain";
 import PromptService from "./PromptService";
 import { MongoDBSaver } from "@langchain/langgraph-checkpoint-mongodb";
 import { MongoClient  } from "mongodb";
+import type { ChatResponse } from "../types/chatResponseType";
 
 export default class AgentService extends PromptService {
     protected chatModel: ChatGroq;

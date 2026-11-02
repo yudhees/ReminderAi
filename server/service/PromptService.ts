@@ -30,6 +30,10 @@ Do not assume that "again", "earlier", "before", etc. refer only to the current 
                     nullable: true,
                     description: "ISO datetime only for an explicit reminder request. Otherwise null."
                 },
+                user_specified_seconds: {
+                    type: "boolean",
+                    description: "True only when the user explicitly mentions seconds in their reminder time (e.g., 'remind me at 2:30:45 PM'). False when user only specifies hours and minutes (e.g., 'remind me at 2:30 PM' or 'remind me in 5 minutes')."
+                },
                 timezone: {
                     type: "string",
                     description: `IANA timezone. Example: ${timezone}`
@@ -46,6 +50,7 @@ Do not assume that "again", "earlier", "before", etc. refer only to the current 
             required: [
                 "heading",
                 "exact_remind_time",
+                "user_specified_seconds",
                 "timezone",
                 "isValidPrompt",
                 "textForChatResponse",
@@ -65,6 +70,11 @@ Do not assume that "again", "earlier", "before", etc. refer only to the current 
                 .nullable()
                 .describe(
                     "ISO datetime only for an explicit reminder request. Otherwise null."
+                ),
+            user_specified_seconds: z
+                .boolean()
+                .describe(
+                    "True only when the user explicitly mentions seconds in their reminder time (e.g., 'remind me at 2:30:45 PM'). False when user only specifies hours and minutes (e.g., 'remind me at 2:30 PM' or 'remind me in 5 minutes')."
                 ),
             timezone: z
                 .string()

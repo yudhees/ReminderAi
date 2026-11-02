@@ -13,7 +13,7 @@ const initWebPush = () => {
     );
 }
 
-export const sendPushNotification = async (userId: string, title: string, body: string, reminderId: string) => {
+export const sendPushNotification = async (userId: string, title: string, body: string, reminderId: string, sound?: string) => {
     initWebPush()
     const subscriptions = await Subscription.find({ userId })
 
@@ -34,7 +34,8 @@ export const sendPushNotification = async (userId: string, title: string, body: 
                     title,
                     body,
                     reminderId,
-                    icon: '/icons/web-app-manifest-192x192.png'
+                    icon: '/icons/web-app-manifest-192x192.png',
+                    sound: sound || 'alarm.mp3'
                 })
             );
             results.push({ success: true, endpoint: subscription.endpoint })

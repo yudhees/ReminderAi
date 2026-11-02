@@ -41,6 +41,20 @@ self.addEventListener('push', (event) => {
                 )
 
                 console.log('[SW] NOTIFICATION SUCCESS')
+
+                // Post message to open clients to play custom sound
+                const soundToPlay = data.sound || 'alarm.mp3'
+                const clients = await self.clients.matchAll({
+                    type: 'window',
+                    includeUncontrolled: true
+                })
+                clients.forEach(client => {
+                    client.postMessage({
+                        type: 'playNotificationSound',
+                        sound: soundToPlay
+                    })
+                })
+                console.log('[SW] SOUND MESSAGE SENT TO', clients.length, 'CLIENT(S)')
             } catch (error) {
                 console.error('[SW] NOTIFICATION FAILED:', error)
                 throw error

@@ -4,7 +4,8 @@ interface ChatResponse{
     heading:string,
     isValidPrompt:boolean,
     textForChatResponse:string,
-    timezone:string
+    timezone:string,
+    user_specified_seconds:boolean
 }
 type InteractionPayload = {
   sessionId: string
