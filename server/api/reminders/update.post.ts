@@ -32,6 +32,8 @@ export default defineEventHandler(async (event) => {
         update.remind_time = date
         update.recurrence_anchor = null
         update.notification_sent = false
+        update.alert_repeats_left = 0
+        update.alert_next_at = null
     }
     if (!Object.keys(update).length) {
         throw createError({ statusCode: 400, statusMessage: 'Nothing to update' })

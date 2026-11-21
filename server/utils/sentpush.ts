@@ -13,7 +13,7 @@ const initWebPush = () => {
     );
 }
 
-export const sendPushNotification = async (userId: string, title: string, body: string, reminderId: string, sound?: string) => {
+export const sendPushNotification = async (userId: string, title: string, body: string, reminderId: string, sound?: string, extra: Record<string, any> = {}) => {
     initWebPush()
     const subscriptions = await Subscription.find({ userId })
 
@@ -35,8 +35,12 @@ export const sendPushNotification = async (userId: string, title: string, body: 
                     body,
                     reminderId,
                     icon: '/icons/web-app-manifest-192x192.png',
-                    sound: sound || 'alarm.mp3'
-                })
+                    sound: sound || 'alarm.mp3',
+                    url: `/chat/${reminderId}`,
+                    ...extra,
+                }),
+                // high urgency + short TTL: deliver right away (wakes Android from doze), drop if stale
+                { urgency: 'high', TTL: 300 }
             );
             results.push({ success: true, endpoint: subscription.endpoint })
         } catch (error) {

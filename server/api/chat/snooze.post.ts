@@ -20,6 +20,8 @@ export default defineEventHandler(async (event) => {
     const update: Record<string, any> = {
         remind_time: snoozedUntil,
         notification_sent: false,
+        alert_repeats_left: 0,
+        alert_next_at: null,
     }
     // For a repeating reminder, remember the regular schedule so only this occurrence moves.
     if (normalizeRecurrence(session.recurrence) && !session.recurrence_anchor) {

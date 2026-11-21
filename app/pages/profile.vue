@@ -24,9 +24,9 @@
                     <!-- <NotificationBarLayout heading="Email Reminders" description="Backup alerts to your email" v-model="form.email_reminders"
                     @change="save('email_reminders')"
                     /> -->
-                    <!-- <NotificationBarLayout heading="Sound Alerts" description="Play a chime when reminder fires" v-model="form.sound_alerts"
+                    <NotificationBarLayout heading="Keep Ringing" description="Alert again every minute (up to 4 times) until you tap, snooze or stop the reminder" v-model="form.sound_alerts"
                     @change="save('sound_alerts')"
-                    /> -->
+                    />
                     <!-- new sound selector -->
                     <NotificationBarLayout heading="Sound" description="Choose notification sound">
                          <div class="flex items-center gap-2">

@@ -4,6 +4,12 @@ import EmailService from '../../service/EmailService';
 import { sendPushNotification } from '../../utils/sentpush';
 import { nextOccurrence, normalizeRecurrence } from '../../utils/recurrence';
 
+// After the first alert, keep re-alerting the phone this many times (one per cron run, ~1 min apart)
+// until the user taps, snoozes, stops or swipes the notification away.
+const RING_REPEATS = 4;
+const RING_INTERVAL_MS = 60 * 1000;
+const soundFile = (user: any) => (user?.notification_sound ? `${user.notification_sound}.mp3` : 'alarm.mp3');
+
 /**
  * Sends every due reminder once.
  * - One-time reminders are marked as sent (kept so they still show in history).
@@ -39,6 +45,9 @@ export default defineEventHandler(async (event) => {
             const claimUpdate: Record<string, any> = nextTime
                 ? { $set: { remind_time: nextTime, recurrence_anchor: null, notification_sent_at: now } }
                 : { $set: { notification_sent: true, notification_sent_at: now } };
+            // Clear any ringing left over from a previous occurrence.
+            claimUpdate.$set.alert_repeats_left = 0;
+            claimUpdate.$set.alert_next_at = null;
             const claim = await ChatSession.updateOne(
                 { _id: reminder._id, remind_time: reminder.remind_time, notification_sent: { $ne: true } },
                 claimUpdate
@@ -55,7 +64,8 @@ export default defineEventHandler(async (event) => {
                         'Reminder',
                         reminder.heading,
                         String(reminder._id),
-                        user.notification_sound ? `${user.notification_sound}.mp3` : 'alarm.mp3'
+                        soundFile(user),
+                        { ring: true, attempt: 1 }
                     );
                     if (pushResults.some((r: any) => r.success)) sentMethods.push('push');
                 } catch (error) {
@@ -72,9 +82,14 @@ export default defineEventHandler(async (event) => {
                 if (emailResult.success) sentMethods.push('email');
             }
 
+            const ringSet: Record<string, any> = {};
+            if (sentMethods.includes('push') && user?.sound_alerts !== false) {
+                ringSet.alert_repeats_left = RING_REPEATS;
+                ringSet.alert_next_at = new Date(now.getTime() + RING_INTERVAL_MS);
+            }
             await ChatSession.updateOne(
                 { _id: reminder._id },
-                { $set: { notification_sent_via: sentMethods.join(',') || 'none' } }
+                { $set: { notification_sent_via: sentMethods.join(',') || 'none', ...ringSet } }
             );
 
             if (!user) console.error('User not found for reminder', String(reminder._id));
@@ -86,9 +101,40 @@ export default defineEventHandler(async (event) => {
             });
         }
 
+        // Second pass: re-alert reminders that are still ringing (not acknowledged yet).
+        const ringing = await ChatSession.find({
+            alert_next_at: { $lte: now, $ne: null },
+            alert_repeats_left: { $gt: 0 },
+        }).lean();
+        let reAlerted = 0;
+        for (const reminder of ringing as any[]) {
+            const left = reminder.alert_repeats_left - 1;
+            const claim = await ChatSession.updateOne(
+                { _id: reminder._id, alert_next_at: reminder.alert_next_at, alert_repeats_left: reminder.alert_repeats_left },
+                { $set: { alert_repeats_left: left, alert_next_at: left > 0 ? new Date(now.getTime() + RING_INTERVAL_MS) : null } }
+            );
+            if (!claim.modifiedCount) continue;
+            const user: any = usersById.get(String(reminder.userId)) ?? await User.findById(reminder.userId).lean();
+            if (!user?.push_notification) continue;
+            try {
+                await sendPushNotification(
+                    String(user._id),
+                    'Reminder (still ringing)',
+                    reminder.heading,
+                    String(reminder._id),
+                    soundFile(user),
+                    { ring: true, attempt: RING_REPEATS - left + 1 }
+                );
+                reAlerted++;
+            } catch (error) {
+                console.error('Re-alert failed:', error);
+            }
+        }
+
         return {
             success: true,
             processed: results.length,
+            reAlerted,
             results
         };
     } catch (error) {

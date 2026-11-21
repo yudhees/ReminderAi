@@ -14,10 +14,14 @@ export const ChatSession = defineModel("chat_session", {
     recurrence:{type:String, default:null},
     // original schedule of a recurring reminder whose current occurrence was snoozed
     recurrence_anchor:{type:Date, default:null},
+    // "ring until acknowledged": how many more push alerts to send, and when the next one is due
+    alert_repeats_left:{type:Number, default:0},
+    alert_next_at:{type:Date, default:null},
 }, {
     indexes: [
         { userId: 1, remind_time: 1 },
         { userId: 1 },
         { notification_sent: 1, remind_time: 1 },
+        { alert_next_at: 1 },
     ],
 })
