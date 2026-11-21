@@ -82,5 +82,11 @@ export const useChatSideBarStore = defineStore('ChatSideBarStore', () => {
         if (chat) Object.assign(chat, patch)
     }
 
-    return { chats, paginate, loadChats, loadSpecificChat, deleteSession, saveRename, removeChat, updateLocalChat }
+    /** Removes a chat the server already deleted (finished one-time reminder). */
+    const dropLocal = (chatId: string) => {
+        const index = chats.value.findIndex(chat => chat.id == chatId)
+        if (index !== -1) chats.value.splice(index, 1)
+    }
+
+    return { chats, paginate, loadChats, loadSpecificChat, deleteSession, saveRename, removeChat, updateLocalChat, dropLocal }
 })

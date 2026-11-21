@@ -20,6 +20,7 @@ type Recorder = {
 let rec: Recorder
 let windowClientList: any[]
 let failNotifications = false
+let ackDeletes = false
 
 const loadWorker = () => {
     rec = { listeners: {}, shown: [], fetches: [], posted: [], opened: [], focused: 0, navigated: [] }
@@ -46,7 +47,7 @@ const loadWorker = () => {
         JSON,
         Promise,
         Date,
-        fetch: async (url: string, init: any) => { rec.fetches.push({ url, body: JSON.parse(init.body) }); return { ok: true } },
+        fetch: async (url: string, init: any) => { rec.fetches.push({ url, body: JSON.parse(init.body) }); return { ok: true, json: async () => ({ success: true, deleted: ackDeletes }) } },
     })
     vm.runInContext(source, context)
 }
@@ -75,6 +76,7 @@ const makeClient = (url = 'https://reminza.test/dashboard') => ({
 
 beforeEach(() => {
     windowClientList = []
+    ackDeletes = false
     loadWorker()
 })
 
@@ -165,4 +167,17 @@ test('the open app still rings if the system notification fails', async () => {
     })
     failNotifications = false
     assert.equal(client.messages[0]?.type, 'playNotificationSound')
+})
+
+test('when Stop finishes a one-time reminder, the open app is told the chat was deleted', async () => {
+    const client = makeClient()
+    windowClientList = [client]
+    ackDeletes = true
+    await fire('notificationclick', notificationEvent('stop'))
+    assert.deepEqual(client.messages.map((m: any) => m.type), ['stopNotificationSound', 'reminderDeleted'])
+})
+
+test('tapping a one-time reminder opens the dashboard url it was sent with', async () => {
+    await fire('notificationclick', notificationEvent('', { reminderId: 'abc123', url: '/dashboard', sound: 'alarm.mp3' }))
+    assert.deepEqual(rec.opened, ['https://reminza.test/dashboard'])
 })

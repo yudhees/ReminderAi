@@ -3,6 +3,7 @@ import { User } from '../../models/users';
 import EmailService from '../../service/EmailService';
 import { sendPushNotification } from '../../utils/sentpush';
 import { nextOccurrence, normalizeRecurrence } from '../../utils/recurrence';
+import { deleteReminderChat, finishedOneTimeFilter } from '../../utils/reminderCleanup';
 
 // After the first alert, keep re-alerting the phone this many times (one per cron run, ~1 min apart)
 // until the user taps, snoozes, stops or swipes the notification away.
@@ -12,7 +13,8 @@ const soundFile = (user: any) => (user?.notification_sound ? `${user.notificatio
 
 /**
  * Sends every due reminder once.
- * - One-time reminders are marked as sent (kept so they still show in history).
+ * - One-time reminders are marked as sent, kept while they ring (so they can still be snoozed),
+ *   and their chat is deleted once the user stops them or a minute after the last alert.
  * - Recurring reminders are moved to their next occurrence.
  * Each reminder is claimed with a conditional update before sending, so two
  * overlapping cron runs can't deliver the same reminder twice.
@@ -65,7 +67,7 @@ export default defineEventHandler(async (event) => {
                         reminder.heading,
                         String(reminder._id),
                         soundFile(user),
-                        { ring: true, attempt: 1 }
+                        { ring: true, attempt: 1, oneTime: !nextTime, ...(nextTime ? {} : { url: '/dashboard' }) }
                     );
                     if (pushResults.some((r: any) => r.success)) sentMethods.push('push');
                 } catch (error) {
@@ -85,6 +87,10 @@ export default defineEventHandler(async (event) => {
             const ringSet: Record<string, any> = {};
             if (sentMethods.includes('push') && user?.sound_alerts !== false) {
                 ringSet.alert_repeats_left = RING_REPEATS;
+                ringSet.alert_next_at = new Date(now.getTime() + RING_INTERVAL_MS);
+            } else if (!nextTime && sentMethods.length > 0) {
+                // Not ringing: give a one-time reminder one minute to be snoozed, then the cleanup below deletes it.
+                ringSet.alert_repeats_left = 0;
                 ringSet.alert_next_at = new Date(now.getTime() + RING_INTERVAL_MS);
             }
             await ChatSession.updateOne(
@@ -111,7 +117,8 @@ export default defineEventHandler(async (event) => {
             const left = reminder.alert_repeats_left - 1;
             const claim = await ChatSession.updateOne(
                 { _id: reminder._id, alert_next_at: reminder.alert_next_at, alert_repeats_left: reminder.alert_repeats_left },
-                { $set: { alert_repeats_left: left, alert_next_at: left > 0 ? new Date(now.getTime() + RING_INTERVAL_MS) : null } }
+                // After the last alert, a one-time reminder keeps one more minute (for Snooze) before it is deleted.
+                { $set: { alert_repeats_left: left, alert_next_at: (left > 0 || !normalizeRecurrence(reminder.recurrence)) ? new Date(now.getTime() + RING_INTERVAL_MS) : null } }
             );
             if (!claim.modifiedCount) continue;
             const user: any = usersById.get(String(reminder.userId)) ?? await User.findById(reminder.userId).lean();
@@ -123,7 +130,7 @@ export default defineEventHandler(async (event) => {
                     reminder.heading,
                     String(reminder._id),
                     soundFile(user),
-                    { ring: true, attempt: RING_REPEATS - left + 1 }
+                    { ring: true, attempt: RING_REPEATS - left + 1, oneTime: !normalizeRecurrence(reminder.recurrence), ...(normalizeRecurrence(reminder.recurrence) ? {} : { url: '/dashboard' }) }
                 );
                 reAlerted++;
             } catch (error) {
@@ -131,10 +138,23 @@ export default defineEventHandler(async (event) => {
             }
         }
 
+        // Third pass: delete the chats of one-time reminders that are finished.
+        const finished = await ChatSession.find(finishedOneTimeFilter(now), { _id: 1 }).lean();
+        let deleted = 0;
+        for (const reminder of finished as any[]) {
+            try {
+                await deleteReminderChat(String(reminder._id));
+                deleted++;
+            } catch (error) {
+                console.error('Cleanup failed for', String(reminder._id), error);
+            }
+        }
+
         return {
             success: true,
             processed: results.length,
             reAlerted,
+            deleted,
             results
         };
     } catch (error) {

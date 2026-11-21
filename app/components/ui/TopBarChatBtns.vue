@@ -1,19 +1,32 @@
 <template>
-    <div class="relative" ref="snoozeWrap">
-        <button type="button" @click="snoozeOpen = !snoozeOpen" aria-label="Snooze" :disabled="!hasReminder || busy"
-            :title="hasReminder ? 'Snooze this reminder' : 'Set a reminder time first'"
-            class="bg-[#1c1c2a] border border-white/5 text-slate-400 rounded-lg h-9 px-2.5 text-xs flex items-center gap-1.5 hover:bg-[#2a2a3e] disabled:opacity-40 disabled:cursor-not-allowed sm:px-3.5">
-            💤<span class="hidden sm:inline">Snooze</span>
-        </button>
-        <div v-if="snoozeOpen"
-            class="absolute right-0 top-full mt-1 z-50 min-w-[150px] rounded-lg border border-slate-700 bg-[#14142d] p-1 shadow-lg">
-            <button v-for="option in snoozeOptions" :key="option.minutes" type="button"
-                class="flex w-full items-center rounded-md px-2 py-1.5 text-left text-sm text-slate-200 transition hover:bg-[#1c1c38]"
-                @click="pickSnooze(option.minutes)">
-                {{ option.label }}
-            </button>
+    <button type="button" @click="openSnooze" aria-label="Snooze" :disabled="!hasReminder || busy"
+        :title="hasReminder ? 'Snooze this reminder' : 'Set a reminder time first'"
+        class="bg-[#1c1c2a] border border-white/5 text-slate-300 rounded-lg h-9 px-2.5 text-xs flex items-center gap-1.5 hover:bg-[#2a2a3e] disabled:opacity-40 disabled:cursor-not-allowed sm:px-3.5">
+        💤<span class="hidden sm:inline">Snooze</span>
+    </button>
+    <!-- Snooze picker: bottom sheet on phones, small dialog on larger screens -->
+    <Teleport to="body">
+        <div v-if="snoozeOpen" class="fixed inset-0 z-[10000] flex items-end justify-center bg-black/60 sm:items-center sm:px-4"
+            @click.self="snoozeOpen = false" @keydown.esc="snoozeOpen = false">
+            <div role="dialog" aria-modal="true" aria-labelledby="snooze-title"
+                class="w-full max-w-sm rounded-t-2xl border border-white/10 bg-[#16162a] shadow-2xl sm:rounded-2xl"
+                style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom))">
+                <div class="mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/20 sm:hidden"></div>
+                <div class="flex items-center justify-between px-5 pt-3 pb-2 sm:pt-4">
+                    <div id="snooze-title" class="text-base font-bold text-slate-100">💤 Snooze reminder</div>
+                    <button type="button" class="h-9 w-9 rounded-lg text-slate-400 hover:bg-white/10" aria-label="Close" @click="snoozeOpen = false">✕</button>
+                </div>
+                <div class="px-3 pb-2">
+                    <button v-for="option in snoozeOptions" :key="option.minutes" type="button"
+                        class="flex w-full items-center justify-between rounded-xl px-3 py-3.5 text-left hover:bg-white/5 active:bg-white/10"
+                        @click="pickSnooze(option.minutes)">
+                        <span class="text-[15px] font-semibold text-slate-100">{{ option.label }}</span>
+                        <span class="text-sm text-slate-400">until {{ untilLabel(option.minutes) }}</span>
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
+    </Teleport>
     <button type="button" :disabled="!canDelete || busy"
         class="border rounded-lg h-9 px-2.5 text-xs whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
         :class="confirmingDelete ? 'bg-red-500/20 border-red-500/40 text-red-300' : 'bg-[#1c1c2a] border-white/5 text-red-400 hover:bg-[#2a2a3e]'"
@@ -23,6 +36,7 @@
     </button>
 </template>
 <script setup>
+import moment from 'moment'
 const props = defineProps({
     hasReminder: { type: Boolean, default: false },
     canDelete: { type: Boolean, default: false },
@@ -35,11 +49,19 @@ const snoozeOptions = [
     { label: '30 minutes', minutes: 30 },
     { label: '1 hour', minutes: 60 },
     { label: '3 hours', minutes: 180 },
-    { label: 'Tomorrow (24 h)', minutes: 1440 },
+    { label: '1 day', minutes: 1440 },
 ]
 const snoozeOpen = ref(false)
-const snoozeWrap = ref(null)
-onClickOutside(snoozeWrap, () => { snoozeOpen.value = false })
+const now = ref(Date.now())
+const openSnooze = () => {
+    now.value = Date.now()
+    snoozeOpen.value = true
+}
+// "until 4:35 PM", or "until tomorrow 4:05 PM"
+const untilLabel = (minutes) => {
+    const at = moment(now.value).add(minutes, 'minutes')
+    return at.isSame(moment(now.value), 'day') ? at.format('h:mm A') : `tomorrow ${at.format('h:mm A')}`
+}
 
 const pickSnooze = (minutes) => {
     snoozeOpen.value = false

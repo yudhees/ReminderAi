@@ -24,14 +24,21 @@ const postToClients = async (message) => {
 }
 
 // Tell the server to stop re-alerting this reminder. Cookies are sent, so the user stays authenticated.
-const acknowledge = (reminderId) => {
-    if (!reminderId || reminderId === 'reminder') return Promise.resolve()
-    return fetch('/api/push/ack', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reminderId }),
-    }).catch(error => console.error('[SW] ack failed', error))
+// A finished one-time reminder is deleted by the server; the open app is told so it can drop the chat.
+const acknowledge = async (reminderId) => {
+    if (!reminderId || reminderId === 'reminder') return
+    try {
+        const res = await fetch('/api/push/ack', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reminderId }),
+        })
+        const body = await res.json().catch(() => ({}))
+        if (body && body.deleted) await postToClients({ type: 'reminderDeleted', reminderId })
+    } catch (error) {
+        console.error('[SW] ack failed', error)
+    }
 }
 
 const snooze = (reminderId, minutes) => fetch('/api/chat/snooze', {

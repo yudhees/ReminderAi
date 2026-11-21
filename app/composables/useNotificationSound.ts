@@ -77,6 +77,19 @@ export function useNotificationSound() {
     stopTimer = setTimeout(() => stopSound(), MAX_RING_MS)
   }
 
+  // The server deletes a one-time reminder once it's stopped: remove it from the sidebar and leave its chat.
+  const nuxtApp = useNuxtApp()
+  const onReminderDeleted = (reminderId: string) => {
+    nuxtApp.runWithContext(() => {
+      try {
+        useChatSideBarStore().dropLocal(reminderId)
+        const router = nuxtApp.$router as any
+        const route = router.currentRoute.value
+        if (route.name === 'chat-id' && route.params.id === reminderId) router.replace({ name: 'dashboard' })
+      } catch (e) { console.error(e) }
+    })
+  }
+
   const closeSystemNotification = async (reminderId: string) => {
     try {
       const reg = await navigator.serviceWorker?.getRegistration('/')
@@ -94,7 +107,8 @@ export function useNotificationSound() {
     if (!alarm) return
     closeSystemNotification(alarm.reminderId)
     try {
-      await $fetch('/api/push/ack', { method: 'POST', body: { reminderId: alarm.reminderId } })
+      const res: any = await $fetch('/api/push/ack', { method: 'POST', body: { reminderId: alarm.reminderId } })
+      if (res?.deleted) onReminderDeleted(alarm.reminderId)
     } catch (e) { console.error(e) }
   }
 
@@ -127,6 +141,8 @@ export function useNotificationSound() {
           body: data.body || '',
           sound: data.sound || 'alarm.mp3',
         })
+      } else if (data.type === 'reminderDeleted') {
+        onReminderDeleted(data.reminderId)
       } else if (data.type === 'stopNotificationSound') {
         if (!data.reminderId || activeAlarm.value?.reminderId === data.reminderId) {
           stopSound()
