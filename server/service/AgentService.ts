@@ -13,7 +13,7 @@ export default class AgentService extends PromptService {
         super()
         this.chatModel = new ChatGroq({
             apiKey: process.env.GROQ_API_KEY,
-            model: "openai/gpt-oss-20b",
+            model: "openai/gpt-oss-120b",
             temperature:1,
         });
         const client = new MongoClient(process.env.NUXT_MONGOOSE_URI as string);
