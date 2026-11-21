@@ -92,6 +92,7 @@ test('push shows an alarm-style notification', async () => {
     assert.equal(options.silent, false)
     assert.ok(Array.isArray(options.vibrate) && options.vibrate.length >= 3, 'has a vibration pattern')
     assert.deepEqual([...options.actions.map((a: any) => a.action)], ['snooze', 'stop'])
+    assert.match(options.actions[0].title, /Snooze/)
     assert.deepEqual({ ...options.data }, { reminderId: 'abc123', url: '/chat/abc123', sound: 'urgent_alert.mp3' })
 })
 
@@ -112,15 +113,22 @@ test('push with a broken payload still shows a notification', async () => {
     assert.equal(rec.shown[0].options.body, 'plain text')
 })
 
-test('Snooze button snoozes 10 minutes and silences the app', async () => {
-    const client = makeClient()
-    windowClientList = [client]
+test('Snooze button snoozes 10 minutes and opens the snooze picker', async () => {
     const event = notificationEvent('snooze')
     await fire('notificationclick', event)
     assert.equal(event.notification.closed, true)
     assert.deepEqual(rec.fetches, [{ url: '/api/chat/snooze', body: { chatId: 'abc123', minutes: 10 } }])
+    assert.deepEqual(rec.opened, ['https://reminza.test/chat/abc123?snooze=1'])
+})
+
+test('Snooze button moves an open app to the snooze picker and silences it', async () => {
+    const client = makeClient()
+    windowClientList = [client]
+    await fire('notificationclick', notificationEvent('snooze'))
     assert.equal(client.messages[0].type, 'stopNotificationSound')
-    assert.equal(rec.opened.length, 0, 'does not open the app')
+    assert.deepEqual(rec.navigated, ['https://reminza.test/chat/abc123?snooze=1'])
+    assert.equal(rec.focused, 1)
+    assert.equal(rec.opened.length, 0)
 })
 
 test('Stop button acknowledges so the server stops re-alerting', async () => {

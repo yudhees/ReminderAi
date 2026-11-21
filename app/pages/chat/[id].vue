@@ -1,7 +1,7 @@
 <template>
     <ClientOnly>
         <Teleport to="#topBarBtns">
-            <TopBarChatBtns :has-reminder="hasReminder" :can-delete="!isNew" :busy="actionBusy" @snooze="snooze" @delete="deleteCurrent" />
+            <TopBarChatBtns :open-snooze-on-load="openSnoozeOnLoad" :has-reminder="hasReminder" :can-delete="!isNew" :busy="actionBusy" @snooze="snooze" @delete="deleteCurrent" />
         </Teleport>
     </ClientOnly>
     <div id="cm" class="flex-1 min-h-0 overflow-y-auto sm:p-6 flex flex-col justify-end gap-4 bg-[#0f0f15]">
@@ -28,4 +28,9 @@ import NewChatText from '~/components/ui/NewChatText.vue';
 import TopBarChatBtns from '~/components/ui/TopBarChatBtns.vue';
 import init from '~/composables/chat';
 const {chatSend,chatInput,isNew,sendChat,sendChatDisabled,chatResponses,bottomEl,hasReminder,actionBusy,snooze,deleteCurrent}=init()
+// ?snooze=1 comes from the notification's Snooze button: open the picker once, then drop it from the URL.
+const route = useRoute()
+const router = useRouter()
+const openSnoozeOnLoad = ref(route.query.snooze === '1')
+if (openSnoozeOnLoad.value) router.replace({ query: { ...route.query, snooze: undefined } })
 </script>

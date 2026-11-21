@@ -36,32 +36,25 @@
     </button>
 </template>
 <script setup>
-import moment from 'moment'
+import { SNOOZE_OPTIONS, snoozeUntilLabel } from '~/utils/snoozeOptions'
 const props = defineProps({
     hasReminder: { type: Boolean, default: false },
     canDelete: { type: Boolean, default: false },
     busy: { type: Boolean, default: false },
+    // Opened from the notification's Snooze button: show the picker straight away.
+    openSnoozeOnLoad: { type: Boolean, default: false },
 })
 const emit = defineEmits(['snooze', 'delete'])
 
-const snoozeOptions = [
-    { label: '10 minutes', minutes: 10 },
-    { label: '30 minutes', minutes: 30 },
-    { label: '1 hour', minutes: 60 },
-    { label: '3 hours', minutes: 180 },
-    { label: '1 day', minutes: 1440 },
-]
+const snoozeOptions = SNOOZE_OPTIONS
 const snoozeOpen = ref(false)
 const now = ref(Date.now())
 const openSnooze = () => {
     now.value = Date.now()
     snoozeOpen.value = true
 }
-// "until 4:35 PM", or "until tomorrow 4:05 PM"
-const untilLabel = (minutes) => {
-    const at = moment(now.value).add(minutes, 'minutes')
-    return at.isSame(moment(now.value), 'day') ? at.format('h:mm A') : `tomorrow ${at.format('h:mm A')}`
-}
+const untilLabel = (minutes) => snoozeUntilLabel(minutes, now.value)
+watch(() => props.openSnoozeOnLoad && props.hasReminder, (open) => { if (open) openSnooze() }, { immediate: true })
 
 const pickSnooze = (minutes) => {
     snoozeOpen.value = false

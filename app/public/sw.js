@@ -83,7 +83,7 @@ const showReminder = async (event) => {
         vibrate: ALARM_VIBRATION,
         timestamp: Date.now(),
         actions: [
-            { action: 'snooze', title: '💤 Snooze 10 min' },
+            { action: 'snooze', title: '💤 Snooze…' },
             { action: 'stop', title: '✋ Stop' },
         ],
         data: {
@@ -99,15 +99,33 @@ self.addEventListener('push', (event) => {
     event.waitUntil(showReminder(event))
 })
 
+// Focus an open app window (moving it to `path`) or open a new one.
+const openApp = async (path, reminderId) => {
+    const target = new URL(path || '/', self.location.origin).href
+    const clients = await windowClients()
+    for (const client of clients) {
+        if (client.url.startsWith(self.location.origin)) {
+            client.postMessage({ type: 'stopNotificationSound', reminderId })
+            if ('navigate' in client && client.url !== target) {
+                try { await client.navigate(target) } catch (e) { /* cross-origin or uncontrolled */ }
+            }
+            return client.focus()
+        }
+    }
+    return self.clients.openWindow(target)
+}
+
 self.addEventListener('notificationclick', (event) => {
     const notification = event.notification
     const { reminderId, url } = notification.data || {}
     notification.close()
 
+    // Snooze: snooze 10 minutes straight away (so it stops ringing even if nothing else is tapped),
+    // then open the reminder with the snooze picker so a different time can be chosen.
     if (event.action === 'snooze') {
         event.waitUntil(Promise.all([
             snooze(reminderId, 10),
-            postToClients({ type: 'stopNotificationSound', reminderId }),
+            openApp(`/chat/${reminderId}?snooze=1`, reminderId),
         ]))
         return
     }
@@ -122,18 +140,7 @@ self.addEventListener('notificationclick', (event) => {
     // Tapping the notification itself: stop ringing and open the reminder.
     event.waitUntil((async () => {
         await acknowledge(reminderId)
-        const target = new URL(url || '/', self.location.origin).href
-        const clients = await windowClients()
-        for (const client of clients) {
-            if (client.url.startsWith(self.location.origin)) {
-                client.postMessage({ type: 'stopNotificationSound', reminderId })
-                if ('navigate' in client && client.url !== target) {
-                    try { await client.navigate(target) } catch (e) { /* cross-origin or uncontrolled */ }
-                }
-                return client.focus()
-            }
-        }
-        return self.clients.openWindow(target)
+        return openApp(url || '/', reminderId)
     })())
 })
 
