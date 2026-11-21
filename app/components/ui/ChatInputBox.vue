@@ -1,6 +1,6 @@
 <template>
-  <textarea placeholder="Ask AI to set, edit, snooze… or tap 🎤 to speak" v-model="input" ref="textArea"
-    class="flex-1 bg-transparent border-none outline-none text-slate-100 text-sm resize-none placeholder:text-slate-600 min-h-[22px] max-h-[120px]"></textarea>
+  <textarea placeholder="Type a reminder…" rows="1" v-model="input" ref="textArea"
+    class="flex-1 bg-transparent border-none outline-none text-slate-100 text-base sm:text-sm resize-none placeholder:text-slate-600 min-h-[22px] max-h-[120px]"></textarea>
 </template>
 <script setup>
 const input = defineModel();

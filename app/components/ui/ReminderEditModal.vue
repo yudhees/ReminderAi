@@ -1,29 +1,29 @@
 <template>
   <Teleport to="body">
-    <div v-if="reminder" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 px-4"
+    <div v-if="reminder" class="fixed inset-0 z-[10000] flex items-end justify-center bg-black/60 sm:items-center sm:px-4"
       @click.self="$emit('close')" @keydown.esc="$emit('close')">
-      <form class="w-full max-w-md bg-[#13131e] border border-white/10 rounded-2xl shadow-xl" @submit.prevent="save">
+      <form class="w-full max-w-md bg-[#13131e] border border-white/10 rounded-t-2xl shadow-xl sm:rounded-2xl" style="padding-bottom: env(safe-area-inset-bottom)" @submit.prevent="save">
         <div class="px-5 py-4 border-b border-white/5 text-sm font-bold">✏️ Edit reminder</div>
         <div class="p-5 flex flex-col gap-4">
           <label class="flex flex-col gap-1.5 text-xs text-slate-400">
             Title
             <input v-model="form.heading" maxlength="200" required ref="titleInput"
-              class="bg-[#1a1a26] border border-white/10 focus:border-indigo-500/40 rounded-lg px-3 py-2 text-sm text-slate-100 outline-none" />
+              class="bg-[#1a1a26] border border-white/10 focus:border-indigo-500/40 rounded-lg px-3 py-2.5 text-base text-slate-100 outline-none sm:py-2 sm:text-sm" />
           </label>
           <label class="flex flex-col gap-1.5 text-xs text-slate-400">
             Date and time
             <input v-model="form.time" type="datetime-local" required :min="minTime"
-              class="bg-[#1a1a26] border border-white/10 focus:border-indigo-500/40 rounded-lg px-3 py-2 text-sm text-slate-100 outline-none [color-scheme:dark]" />
+              class="bg-[#1a1a26] border border-white/10 focus:border-indigo-500/40 rounded-lg px-3 py-2.5 text-base text-slate-100 outline-none [color-scheme:dark] sm:py-2 sm:text-sm" />
           </label>
           <label class="flex flex-col gap-1.5 text-xs text-slate-400">
             Repeat
-            <Select v-model="form.recurrence" :options="repeatOptions" class="text-sm text-slate-100" />
+            <Select v-model="form.recurrence" :options="repeatOptions" class="py-2.5 text-base text-slate-100 sm:py-1.5 sm:text-sm" />
           </label>
           <p v-if="error" class="text-xs text-red-400">{{ error }}</p>
         </div>
         <div class="px-5 py-4 border-t border-white/5 flex justify-end gap-2">
-          <button type="button" class="rounded-lg px-3.5 py-1.5 text-xs text-slate-400 hover:bg-[#2a2a3e]" @click="$emit('close')">Cancel</button>
-          <Button type="submit" :disabled="saving">{{ saving ? 'Saving…' : 'Save' }}</Button>
+          <button type="button" class="rounded-lg px-4 py-2.5 text-sm text-slate-400 hover:bg-[#2a2a3e] sm:px-3.5 sm:py-1.5 sm:text-xs" @click="$emit('close')">Cancel</button>
+          <Button type="submit" class="px-5 py-2.5 text-sm sm:px-3 sm:py-1.5 sm:text-xs" :disabled="saving">{{ saving ? 'Saving…' : 'Save' }}</Button>
         </div>
       </form>
     </div>

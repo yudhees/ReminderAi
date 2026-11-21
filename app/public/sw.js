@@ -52,6 +52,18 @@ const showReminder = async (event) => {
     console.log('[SW] DATA:', data)
 
     const reminderId = data.reminderId || 'reminder'
+
+    // If the app is open, it plays the chosen alarm sound in a loop until stopped.
+    // Sent first, so the in-app alarm still rings even if the system notification fails.
+    await postToClients({
+        type: 'playNotificationSound',
+        sound: data.sound || 'alarm.mp3',
+        reminderId,
+        title: data.title || 'Reminder',
+        body: data.body || '',
+        ring: Boolean(data.ring),
+    })
+
     await self.registration.showNotification(data.title || 'Reminder', {
         body: data.body || 'You have a reminder',
         icon: data.icon || '/icons/web-app-manifest-192x192.png',
@@ -72,16 +84,6 @@ const showReminder = async (event) => {
             url: data.url || '/',
             sound: data.sound || 'alarm.mp3',
         },
-    })
-
-    // If the app is open, it plays the chosen alarm sound in a loop until stopped.
-    await postToClients({
-        type: 'playNotificationSound',
-        sound: data.sound || 'alarm.mp3',
-        reminderId,
-        title: data.title || 'Reminder',
-        body: data.body || '',
-        ring: Boolean(data.ring),
     })
 }
 

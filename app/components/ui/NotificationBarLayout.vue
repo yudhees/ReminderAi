@@ -1,6 +1,6 @@
 <template>
-    <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/5 hover:bg-[#1a1a26]">
-        <div>
+    <div class="flex items-center justify-between gap-3 px-4 py-3.5 border-b border-white/5 hover:bg-[#1a1a26] sm:px-5">
+        <div class="min-w-0 flex-1">
             <div class="text-sm font-semibold">{{ heading }}</div>
             <div class="text-xs text-slate-500 mt-0.5">{{ description }}</div>
         </div>

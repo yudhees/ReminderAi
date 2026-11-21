@@ -1,6 +1,6 @@
 <template>
   <ClientOnly>
-    <div class="sm:px-6 pt-3.5 pb-4.5 border-t border-white/5 bg-[#111118]">
+    <div class="-mx-3 -mb-4 px-3 pt-3 border-t border-white/5 bg-[#111118] sm:mx-0 sm:mb-0 sm:px-6 sm:pt-3.5" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom))">
       <ListingBar v-if="chatSend && chatSend.isListening" />
       <div
         class="bg-[#1a1a26] border border-white/10 focus-within:border-indigo-500/40 rounded-2xl px-3.5 py-3 flex items-end gap-2.5">

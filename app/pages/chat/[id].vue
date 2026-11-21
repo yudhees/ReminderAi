@@ -18,7 +18,7 @@
             <ChatInput :chat-send="chatSend" :send-chat-disabled="sendChatDisabled" v-model="chatInput" @send="sendChat" :is-new="false"/>
         </div>
     </template>
-    <div ref="bottomEl"></div>
+    <div ref="bottomEl" class="-mt-6 h-0 shrink-0"></div>
 </template>
 <script setup>
 import AiResponse from '~/components/ui/AiResponse.vue';

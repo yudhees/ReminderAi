@@ -1,6 +1,6 @@
 
 <template>
-    <div class="min-h-screen overflow-x-hidden bg-[#0f0f13] text-slate-100 font-sans lg:h-screen lg:flex lg:overflow-hidden">
+    <div class="flex h-[100dvh] overflow-hidden bg-[#0f0f13] text-slate-100 font-sans">
         <Sidebar/>
         <MainPage>
             <slot></slot>

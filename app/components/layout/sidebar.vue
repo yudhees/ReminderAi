@@ -5,19 +5,16 @@
     <AppLogo />
     <nav class="flex flex-col gap-0.5 p-2">
       <NuxtLink v-for="route,index in routes" :key="`${index}-route`" :to="route.to"
-        class=" shrink-0 flex items-center gap-2.5 px-3 py-2.5 cursor-pointer rounded-lg text-[13px]"
-        :class="{
-          'text-slate-400 hover:bg-[#1c1c2a] hover:text-slate-200 transition-colors':true,
-          'bg-[#1c1c38] text-violet-300 font-semibold':false
-        }">
+        class="shrink-0 flex items-center gap-2.5 px-3 py-3 cursor-pointer rounded-lg text-sm lg:py-2.5 lg:text-[13px] text-slate-400 hover:bg-[#1c1c2a] hover:text-slate-200 transition-colors"
+        exact-active-class="!bg-[#1c1c38] !text-violet-300 font-semibold">
         {{ route.label }}</NuxtLink>
         <ChatSideBar/>
     </nav>
     <router-link :to="{name:'profile'}" class="block mt-auto px-4 py-3.5 border-t border-white/5 flex items-center gap-2.5">
       <img :src="user.image"  class="w-8.5 h-8.5 w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"/>
-      <div>
-        <div class="text-[13px] font-bold">{{ user.name }}</div>
-        <div class="text-[11px] text-slate-500">{{ user.email }}</div>
+      <div class="min-w-0">
+        <div class="text-[13px] font-bold truncate">{{ user.name }}</div>
+        <div class="text-[11px] text-slate-500 truncate">{{ user.email }}</div>
       </div>
     </router-link>
   </aside>
@@ -26,11 +23,16 @@
 import AppLogo from './AppLogo.vue';
 import ChatSideBar from './ChatSideBar.vue';
 const {user}=useAuthStore()
+// On phones the sidebar is a drawer: close it whenever the page changes.
+const route = useRoute()
+watch(() => route.fullPath, () => {
+  const toggle = document.getElementById('sidebar-toggle')
+  if (toggle) toggle.checked = false
+})
 const routes = [
   { label: "🏠 Dashboard" ,to:{name:"dashboard"}},
   { label: "➕ New Reminder",to:{name:"chat-id",params:{id:'new'}}},
   { label: "📋 All Reminders",to:{name:"all-reminders"}},
-  { label: "🔔 Notifications",to:{}},
   { label: "⚙️ Settings", to:{name:"profile"}},
 ]
 </script>

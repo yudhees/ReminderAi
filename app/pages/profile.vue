@@ -2,12 +2,12 @@
      <Layout>
           <template #left>
                <ProfileCard heading="👤 Profile">
-                    <div class="flex items-center gap-4 p-5">
-                         <img class="w-16 h-16 rounded-full flex-shrink-0"  :src="user.image"/>
-                    <div>
+                    <div class="flex items-center gap-4 p-4 sm:p-5">
+                         <img class="w-14 h-14 rounded-full flex-shrink-0 sm:w-16 sm:h-16"  :src="user.image"/>
+                    <div class="min-w-0">
                          <div class="text-lg font-extrabold">{{ user.name}}</div>
-                         <div class="text-[13px] text-slate-500 mt-0.5">
-                              {{ user.email }} · Google Account
+                         <div class="text-[13px] text-slate-500 mt-0.5 break-all">
+                              {{ user.email }}<span class="hidden sm:inline"> · Google Account</span>
                          </div>
                          <div class="flex gap-2 mt-2.5">
                               <button class="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-3.5 py-1.5 text-xs hover:bg-red-500/20" type="button" @click="logout">
@@ -30,12 +30,12 @@
                     <!-- new sound selector -->
                     <NotificationBarLayout heading="Sound" description="Choose notification sound">
                          <div class="flex items-center gap-2">
-                              <Select :options="soundOptions" v-model="form.notification_sound" 
+                              <Select class="max-w-[9rem]" :options="soundOptions" v-model="form.notification_sound" 
                               @change="()=>{
                                    save('notification_sound')
                                    playSound(form.notification_sound)
                               }"/>
-                              <button type="button" class="p-2 rounded-md hover:bg-slate-100 cursor-pointer" :disabled="!form.notification_sound" @click="playSound(form.notification_sound)">
+                              <button type="button" class="p-2 rounded-md hover:bg-white/10 cursor-pointer" aria-label="Play sound" :disabled="!form.notification_sound" @click="playSound(form.notification_sound)">
                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path d="M6.5 5.5v9a1 1 0 0 0 1.555.832L15.5 11.832A1 1 0 0 0 15.5 9.168L8.055 4.668A1 1 0 0 0 6.5 5.5z"/>
                                    </svg>
@@ -48,7 +48,7 @@
                </ProfileCard>
                <ProfileCard heading="🤖 AI Settings">
                     <NotificationBarLayout heading="AI Language" description="Language for voice and chat input">
-                          <Select :options="languageOptions" v-model="form.ai_input_language" @change="save('ai_input_language')"/>
+                          <Select class="max-w-[9rem] sm:max-w-none" :options="languageOptions" v-model="form.ai_input_language" @change="save('ai_input_language')"/>
                     </NotificationBarLayout>
                </ProfileCard>
           </template>

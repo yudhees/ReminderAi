@@ -1,15 +1,15 @@
 <template>
   <div>
-    <div class="px-1 pb-4 border-b border-white/5 flex gap-2 flex-wrap items-center">
+    <div class="-mx-3 px-3 pb-3 border-b border-white/5 flex gap-2 items-center overflow-x-auto sm:mx-0 sm:px-1 sm:pb-4 sm:flex-wrap">
       <button v-for="view in views" :key="view.value" type="button" @click="setView(view.value)"
-        class="rounded-full px-3.5 py-1.5 text-xs cursor-pointer border"
+        class="shrink-0 rounded-full px-3.5 py-2 text-xs cursor-pointer border sm:py-1.5"
         :class="filters.view === view.value
           ? 'bg-[#1e1e38] border-indigo-500/40 text-violet-300'
           : 'bg-[#1a1a26] border-white/5 text-slate-500 hover:border-indigo-500/40 hover:text-violet-300'">
         {{ view.label }}
       </button>
     </div>
-    <div class="flex-1 overflow-y-auto py-5 flex flex-col gap-6">
+    <div class="flex-1 py-4 flex flex-col gap-5 sm:py-5 sm:gap-6">
       <div v-if="loading && !reminders.length" class="text-sm text-slate-500">Loading reminders…</div>
       <div v-else-if="!reminders.length" class="text-sm text-slate-500">
         {{ emptyText }}
