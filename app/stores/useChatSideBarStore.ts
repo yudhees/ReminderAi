@@ -52,8 +52,12 @@ export const useChatSideBarStore = defineStore('ChatSideBarStore', () => {
 
     const deleteSession = async (chatId: string, chatIndex: number) => {
         if (chats.value[chatIndex]) {
-            await deleteChat(chatId)
-            chats.value.splice(chatIndex, 1)
+            try {
+                await deleteChat(chatId)
+                chats.value.splice(chatIndex, 1)
+            } catch (error) {
+                console.error(error);
+            }
         }
     }
 
@@ -65,5 +69,18 @@ export const useChatSideBarStore = defineStore('ChatSideBarStore', () => {
         }
     }
 
-    return { chats, paginate, loadChats, loadSpecificChat, deleteSession, saveRename }
+    /** Deletes a chat by id (from any page) and drops it from the sidebar list. */
+    const removeChat = async (chatId: string) => {
+        await deleteChat(chatId)
+        const index = chats.value.findIndex(chat => chat.id == chatId)
+        if (index !== -1) chats.value.splice(index, 1)
+    }
+
+    /** Keeps the sidebar in sync after a reminder is edited or snoozed elsewhere. */
+    const updateLocalChat = (chatId: string, patch: Partial<ChatResponseType>) => {
+        const chat = chats.value.find(chat => chat.id == chatId)
+        if (chat) Object.assign(chat, patch)
+    }
+
+    return { chats, paginate, loadChats, loadSpecificChat, deleteSession, saveRename, removeChat, updateLocalChat }
 })

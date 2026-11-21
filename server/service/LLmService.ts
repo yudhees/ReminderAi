@@ -13,7 +13,7 @@ export class LLmService extends PromptService {
     }
     async streamChat(prompt: string, timezone: string, sessionId: string,userId:string) {
         const currentIST = this.userCurrentTime(timezone);
-        const userPrompt=this.getInputPrompt(currentIST, prompt)
+        const userPrompt=this.getInputPrompt(currentIST, prompt, timezone)
         const interaction=await this.agentService.chat(userPrompt,sessionId,userId)
         return interaction
     }

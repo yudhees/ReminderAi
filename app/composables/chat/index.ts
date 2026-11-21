@@ -21,7 +21,54 @@ export default function init() {
     const sessionId=ref(route.params.id)
     const timezone = userTimezone()
     const {setDescription,setLabel}=useTopBarStore()
-    const {loadSpecificChat}=useChatSideBarStore()
+    const {loadSpecificChat,removeChat,updateLocalChat}=useChatSideBarStore()
+    const session = ref<{ _id: string, heading?: string, remind_time?: string | null, recurrence?: string | null } | null>(null)
+    const actionBusy = ref(false)
+    const hasReminder = computed(() => !isNew.value && Boolean(session.value?.remind_time))
+    const refreshSession = async () => {
+        if (isNew.value) return
+        try {
+            const res = await $fetch('/api/chat/validateSession', {
+                method: "POST", body: { sessionId: sessionId.value }
+            })
+            if (res.success) session.value = res.session as any
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    const { $toast } = useNuxtApp() as any
+    const toastError = (error: any, fallback: string) => {
+        $toast.error(error?.data?.statusMessage || error?.statusMessage || fallback)
+    }
+    const snooze = async (minutes: number) => {
+        if (!hasReminder.value) return
+        actionBusy.value = true
+        try {
+            const res = await $fetch<{ remind_time: string }>('/api/chat/snooze', {
+                method: "POST",
+                body: { chatId: sessionId.value, minutes }
+            })
+            if (session.value) session.value.remind_time = res.remind_time
+            updateLocalChat(String(sessionId.value), { remind_time: res.remind_time })
+            $toast.success(`Snoozed until ${moment(res.remind_time).format('ddd, h:mm A')}`)
+        } catch (error) {
+            console.error(error);
+            toastError(error, 'Could not snooze this reminder')
+        }
+        actionBusy.value = false
+    }
+    const deleteCurrent = async () => {
+        if (isNew.value) return
+        actionBusy.value = true
+        try {
+            await removeChat(String(sessionId.value))
+            $toast.success('Reminder deleted')
+        } catch (error) {
+            console.error(error);
+            toastError(error, 'Could not delete this reminder')
+        }
+        actionBusy.value = false
+    }
     const validateSession = async () => {
         if (!isNew.value) {
             const res = await $fetch('/api/chat/validateSession', {
@@ -30,9 +77,8 @@ export default function init() {
             if (!res.success) {
                 router.replace({ name: "chat-id", params: { id: 'new' } })
             } else {
-                const {session}=res
-                // setLabel(session?.heading as string)
-                setLabel(session?.heading as string)
+                session.value = res.session as any
+                setLabel(res.session?.heading as string)
                 loadChat().then(()=>{
                     nextTick(()=>{
                         scrollDown()
@@ -82,7 +128,7 @@ export default function init() {
                 body: { input, timezone, sessionId: sessionId.value },
             })
             //@ts-ignore
-            const session = res.sessionId
+            const newSessionId = res.sessionId
             chatResponses.value.pop()
             chatResponses.value.push({
                 type: "ai",
@@ -92,12 +138,16 @@ export default function init() {
                 
             })
             if (isNew.value) {
-                const url=router.resolve({params:{id:session}})
+                const url=router.resolve({params:{id:newSessionId}})
                 replaceUrl(url.href)
                 router.replace(url.href)
-                await loadSpecificChat(session)
+                await loadSpecificChat(newSessionId)
             }
-            sessionId.value=session
+            sessionId.value=newSessionId
+            await refreshSession()
+            if (!isNew.value && session.value) {
+                updateLocalChat(String(sessionId.value), { remind_time: session.value.remind_time as any })
+            }
         } catch (error) {
             console.error(error);
         }
@@ -121,5 +171,5 @@ export default function init() {
         }
         setDescription('')
     })
-    return { chatSend, chatInput, isNew, sendChat, sendChatDisabled, chatResponses, bottomEl }
+    return { chatSend, chatInput, isNew, sendChat, sendChatDisabled, chatResponses, bottomEl, hasReminder, actionBusy, snooze, deleteCurrent }
 }

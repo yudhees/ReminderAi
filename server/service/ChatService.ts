@@ -4,6 +4,7 @@ import moment from "moment-timezone";
 import { ChatHistory } from "../models/ChatHistory";
 import { CheckPointWrites } from "../models/CheckPointWrites";
 import { Checkpoints } from "../models/CheckPoints";
+import { normalizeRecurrence } from "../utils/recurrence";
 export default class {
 
     public llm: LLmService;
@@ -87,6 +88,9 @@ export default class {
             }
             const utcDate = parsedDate.utc().toDate()
             sessionUpdate.remind_time=utcDate
+            sessionUpdate.recurrence=normalizeRecurrence(interaction?.recurrence)
+            sessionUpdate.recurrence_anchor=null
+            sessionUpdate.notification_sent=false
         }
         await ChatSession.updateOne({_id:sessionId},{$set:sessionUpdate})
         await ChatHistory.insertMany([

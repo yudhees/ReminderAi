@@ -5,7 +5,8 @@ interface ChatResponse{
     isValidPrompt:boolean,
     textForChatResponse:string,
     timezone:string,
-    user_specified_seconds:boolean
+    user_specified_seconds:boolean,
+    recurrence?:'none'|'daily'|'weekly'|'monthly'|'yearly'
 }
 type InteractionPayload = {
   sessionId: string

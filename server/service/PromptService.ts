@@ -12,9 +12,16 @@ For questions about previous conversation, carefully distinguish:
 - what the user is saying now
 - what the assistant said earlier
 Do not assume that "again", "earlier", "before", etc. refer only to the current message.
+Recurring reminders:
+- When the user asks for a repeating reminder ("every day", "daily", "every Monday", "every week", "monthly", "every year", "on my birthday each year"),
+  set recurrence to daily, weekly, monthly or yearly, and set exact_remind_time to the FIRST future occurrence.
+- If the user wants to stop repeating a reminder in this conversation, keep the existing time and set recurrence to none.
+- One-time reminders always use recurrence none.
+- Mention the repeat schedule in textForChatResponse when there is one.
 `;
-    getInputPrompt(currentIST: string, prompt: string) {
-        return `Current IST Time:${currentIST},User Request:${prompt}`
+    getInputPrompt(currentTime: string, prompt: string, timezone?: string) {
+        const tz = timezone ? ` (${timezone})` : ''
+        return `Current user time${tz}:${currentTime},User Request:${prompt}`
     }
     getSchema(timezone: string) {
         const outputJsonSchema = {
@@ -45,6 +52,11 @@ Do not assume that "again", "earlier", "before", etc. refer only to the current 
                 textForChatResponse: {
                     type: "string",
                     maxLength: 200,
+                },
+                recurrence: {
+                    type: "string",
+                    enum: ["none", "daily", "weekly", "monthly", "yearly"],
+                    description: "How often the reminder repeats. none for a one-time reminder."
                 }
             },
             required: [
@@ -54,6 +66,7 @@ Do not assume that "again", "earlier", "before", etc. refer only to the current 
                 "timezone",
                 "isValidPrompt",
                 "textForChatResponse",
+                "recurrence",
             ]
         }
         return outputJsonSchema
@@ -87,6 +100,11 @@ Do not assume that "again", "earlier", "before", etc. refer only to the current 
             textForChatResponse: z
                 .string()
                 .max(200),
+            recurrence: z
+                .enum(["none", "daily", "weekly", "monthly", "yearly"])
+                .describe(
+                    "How often the reminder repeats: daily, weekly, monthly or yearly. none for a one-time reminder or when the user asks to stop repeating."
+                ),
         });
         return outputSchema
     }

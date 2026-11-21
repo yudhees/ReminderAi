@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "test-email": "node test-email.js"
+    "test-email": "node test-email.js",
+    "test": "node --experimental-strip-types --test tests/recurrence.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",
