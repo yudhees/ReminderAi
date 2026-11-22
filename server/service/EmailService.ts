@@ -1,5 +1,14 @@
 import nodemailer from 'nodemailer';
-import { User } from '../models/users';
+import { buildReminderEmail, APP_URL } from '../utils/reminderEmail';
+
+export interface ReminderEmailOptions {
+    timezone?: string | null;
+    recurrence?: string | null;
+    /** Chat id; recurring reminders link straight to their chat. */
+    reminderId?: string;
+    /** One-time reminders are deleted after they fire, so they link to the dashboard instead. */
+    oneTime?: boolean;
+}
 
 export default class EmailService {
     private transporter: nodemailer.Transporter;
@@ -14,19 +23,24 @@ export default class EmailService {
         });
     }
 
-    async sendReminderEmail(userEmail: string, reminderHeading: string, remindTime: Date) {
+    async sendReminderEmail(userEmail: string, reminderHeading: string, remindTime: Date, options: ReminderEmailOptions = {}) {
         try {
-            
+            const url = options.reminderId && !options.oneTime
+                ? `${APP_URL}/chat/${encodeURIComponent(options.reminderId)}`
+                : `${APP_URL}/dashboard`;
+            const { subject, html, text } = buildReminderEmail({
+                heading: reminderHeading,
+                remindTime,
+                timezone: options.timezone,
+                recurrence: options.recurrence,
+                url,
+            });
             const info = await this.transporter.sendMail({
-                from: process.env.GMAIL_EMAIL,
+                from: { name: 'Reminza', address: process.env.GMAIL_EMAIL || '' },
                 to: userEmail,
-                subject: `Reminder: ${reminderHeading}`,
-                text: `This is a reminder for: ${reminderHeading}\n\nTime: ${remindTime.toLocaleString()}`,
-                html: `
-                    <h2>Reminder: ${reminderHeading}</h2>
-                    <p>This is a reminder for your scheduled task.</p>
-                    <p><strong>Time:</strong> ${remindTime.toLocaleString()}</p>
-                `,
+                subject,
+                text,
+                html,
             });
             return { success: true, messageId: info.messageId };
         } catch (error) {

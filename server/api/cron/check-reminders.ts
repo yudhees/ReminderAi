@@ -79,7 +79,13 @@ export default defineEventHandler(async (event) => {
                 const emailResult = await emailService.sendReminderEmail(
                     user.email,
                     reminder.heading,
-                    reminder.remind_time
+                    reminder.remind_time,
+                    {
+                        timezone: reminder.timezone,
+                        recurrence: reminder.recurrence,
+                        reminderId: String(reminder._id),
+                        oneTime: !nextTime,
+                    }
                 );
                 if (emailResult.success) sentMethods.push('email');
             }
