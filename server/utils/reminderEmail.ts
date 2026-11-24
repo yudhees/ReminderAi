@@ -1,6 +1,8 @@
 // Builds the reminder email (subject, HTML, plain text). Kept free of server imports so it can be unit tested.
 
 export const APP_URL = 'https://reminza.vercel.app'
+/** Same icon the installed app uses (public/icons). Must be an absolute URL so mail apps can load it. */
+export const LOGO_URL = `${APP_URL}/icons/web-app-manifest-192x192.png`
 
 export interface ReminderEmailInput {
     heading: string
@@ -88,7 +90,7 @@ export function buildReminderEmail(input: ReminderEmailInput) {
   <table role="presentation" class="container" width="560" cellpadding="0" cellspacing="0" border="0" style="width:560px;max-width:560px;">
 
     <tr><td align="left" style="padding:0 4px 16px 4px;font-family:${font};font-size:18px;font-weight:700;color:#13131e;">
-      <span style="display:inline-block;width:30px;height:30px;line-height:30px;text-align:center;border-radius:8px;background-color:#6366f1;background-image:linear-gradient(135deg,#6366f1,#9333ea);font-size:16px;vertical-align:middle;">&#9200;</span>
+      <img src="${LOGO_URL}" width="36" height="36" alt="Reminza" style="display:inline-block;width:36px;height:36px;border:0;outline:none;text-decoration:none;vertical-align:middle;">
       <span style="vertical-align:middle;padding-left:8px;">Reminza</span>
     </td></tr>
 

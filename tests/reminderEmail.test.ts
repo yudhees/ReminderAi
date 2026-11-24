@@ -27,5 +27,6 @@ test('shows the repeat label and link, and keeps subject on one line', () => {
     assert.ok(html.includes('Repeats weekly') && text.includes('Repeats weekly'))
     assert.ok(html.includes('href="https://reminza.vercel.app/chat/abc"'))
     assert.ok(!buildReminderEmail({ heading: 'a', remindTime: new Date(), recurrence: 'none' }).html.includes('Repeats'))
+    assert.ok(html.includes('src="https://reminza.vercel.app/icons/web-app-manifest-192x192.png"'))
     assert.equal(escapeHtml(undefined), '')
 })
