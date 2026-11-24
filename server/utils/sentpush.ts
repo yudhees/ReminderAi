@@ -50,3 +50,23 @@ export const sendPushNotification = async (userId: string, title: string, body: 
     }
     return results
 }
+/**
+ * A reminder was stopped or snoozed on one device: tell the user's other devices to stop ringing it.
+ * `exceptEndpoint` is the device that pressed the button, so it isn't sent a needless push.
+ */
+export const sendStopRinging = async (userId: string, reminderId: string, opts: { exceptEndpoint?: string, deleted?: boolean, snoozed?: boolean } = {}) => {
+    initWebPush()
+    const subscriptions = await Subscription.find({ userId })
+    const payload = JSON.stringify({ type: 'stopRinging', reminderId, deleted: Boolean(opts.deleted), snoozed: Boolean(opts.snoozed) })
+    await Promise.all(subscriptions
+        .filter((s: any) => s.endpoint && s.endpoint !== opts.exceptEndpoint)
+        .map((s: any) => webpush.sendNotification(
+            { endpoint: s.endpoint, expirationTime: null, keys: { p256dh: s.p256dh, auth: s.auth } },
+            payload,
+            { urgency: 'high', TTL: 120 }
+        ).catch(error => console.error('Stop-ringing push failed for', s.endpoint, error?.statusCode || error))))
+}
+
+/** True while a reminder is still alerting (ringing, or waiting to re-alert). */
+export const isAlerting = (session: { alert_next_at?: Date | null, alert_repeats_left?: number | null }) =>
+    Boolean(session?.alert_next_at) || Number(session?.alert_repeats_left || 0) > 0

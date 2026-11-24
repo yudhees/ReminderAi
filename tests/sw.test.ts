@@ -21,8 +21,9 @@ let rec: Recorder
 let windowClientList: any[]
 let failNotifications = false
 let ackDeletes = false
+let visible: any[] = []
 
-const loadWorker = () => {
+const loadWorker = (sub: { endpoint: string } | null = null) => {
     rec = { listeners: {}, shown: [], fetches: [], posted: [], opened: [], focused: 0, navigated: [] }
     const self: any = {
         location: { origin: 'https://reminza.test' },
@@ -33,6 +34,8 @@ const loadWorker = () => {
                 if (failNotifications) throw new TypeError('No notification permission has been granted for this origin.')
                 rec.shown.push({ title, options })
             },
+            getNotifications: async ({ tag }: { tag: string }) => visible.filter(n => n.tag === tag && !n.closed),
+            ...(sub ? { pushManager: { getSubscription: async () => sub } } : {}),
         },
         clients: {
             claim: async () => {},
@@ -77,6 +80,7 @@ const makeClient = (url = 'https://reminza.test/dashboard') => ({
 beforeEach(() => {
     windowClientList = []
     ackDeletes = false
+    visible = []
     loadWorker()
 })
 
@@ -188,4 +192,46 @@ test('when Stop finishes a one-time reminder, the open app is told the chat was 
 test('tapping a one-time reminder opens the dashboard url it was sent with', async () => {
     await fire('notificationclick', notificationEvent('', { reminderId: 'abc123', url: '/dashboard', sound: 'alarm.mp3' }))
     assert.deepEqual(rec.opened, ['https://reminza.test/dashboard'])
+})
+
+
+test('Stop sends this device\'s push endpoint so only the other devices are told', async () => {
+    loadWorker({ endpoint: 'https://push.example/me' })
+    await fire('notificationclick', notificationEvent('stop'))
+    assert.deepEqual(rec.fetches, [{ url: '/api/push/ack', body: { reminderId: 'abc123', endpoint: 'https://push.example/me' } }])
+})
+
+test('a stop-ringing push silences an open app and swaps the ringing notification for a quiet one', async () => {
+    const client = makeClient()
+    windowClientList = [client]
+    visible = [{ title: 'Reminder', tag: 'abc123', closed: false, close() { this.closed = true } }]
+    const ringing = visible[0]
+    await fire('push', pushEvent({ type: 'stopRinging', reminderId: 'abc123' }))
+    assert.equal(client.messages[0].type, 'stopNotificationSound')
+    assert.equal(client.messages[0].reminderId, 'abc123')
+    assert.equal(ringing.closed, true)
+    assert.equal(rec.shown.length, 1)
+    const { options } = rec.shown[0]
+    assert.equal(options.silent, true)
+    assert.equal(options.renotify, false)
+    assert.equal(options.body, 'Stopped on another device')
+    assert.equal(options.data.quiet, true)
+    assert.equal(options.actions, undefined)
+})
+
+test('a stop-ringing push with nothing ringing shows nothing', async () => {
+    await fire('push', pushEvent({ type: 'stopRinging', reminderId: 'abc123', snoozed: true }))
+    assert.equal(rec.shown.length, 0)
+})
+
+test('a stop-ringing push for a deleted reminder tells the app to drop it', async () => {
+    const client = makeClient()
+    windowClientList = [client]
+    await fire('push', pushEvent({ type: 'stopRinging', reminderId: 'abc123', deleted: true }))
+    assert.deepEqual(client.messages.map((m: any) => m.type), ['stopNotificationSound', 'reminderDeleted'])
+})
+
+test('swiping away the quiet note does not call the server', async () => {
+    await fire('notificationclose', notificationEvent('', { reminderId: 'abc123', url: '/chat/abc123', quiet: true } as any))
+    assert.equal(rec.fetches.length, 0)
 })

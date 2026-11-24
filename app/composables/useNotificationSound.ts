@@ -90,6 +90,15 @@ export function useNotificationSound() {
     })
   }
 
+  // This device's push endpoint, so the server only tells the OTHER devices to stop ringing.
+  const ownEndpoint = async (): Promise<string | undefined> => {
+    try {
+      const reg = await navigator.serviceWorker?.getRegistration('/')
+      const sub = await reg?.pushManager?.getSubscription()
+      return sub?.endpoint || undefined
+    } catch (e) { return undefined }
+  }
+
   const closeSystemNotification = async (reminderId: string) => {
     try {
       const reg = await navigator.serviceWorker?.getRegistration('/')
@@ -107,7 +116,7 @@ export function useNotificationSound() {
     if (!alarm) return
     closeSystemNotification(alarm.reminderId)
     try {
-      const res: any = await $fetch('/api/push/ack', { method: 'POST', body: { reminderId: alarm.reminderId } })
+      const res: any = await $fetch('/api/push/ack', { method: 'POST', body: { reminderId: alarm.reminderId, endpoint: await ownEndpoint() } })
       if (res?.deleted) onReminderDeleted(alarm.reminderId)
     } catch (e) { console.error(e) }
   }
@@ -120,7 +129,7 @@ export function useNotificationSound() {
     if (!alarm) return
     closeSystemNotification(alarm.reminderId)
     try {
-      await $fetch('/api/chat/snooze', { method: 'POST', body: { chatId: alarm.reminderId, minutes } })
+      await $fetch('/api/chat/snooze', { method: 'POST', body: { chatId: alarm.reminderId, minutes, endpoint: await ownEndpoint() } })
     } catch (e) { console.error(e) }
   }
 
