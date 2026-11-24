@@ -1,12 +1,13 @@
 import * as z from "zod"
 import { findOwnedSession, requireAuthUser } from "~~/server/utils/global"
-import { normalizeRecurrence, RECURRENCE_OPTIONS } from "~~/server/utils/recurrence"
+import { normalizeRecurrence } from "~~/server/utils/recurrence"
 
 const bodySchema = z.object({
     id: z.string(),
     heading: z.string().trim().min(1).max(200).optional(),
     remind_time: z.string().optional(),
-    recurrence: z.enum(RECURRENCE_OPTIONS).optional(),
+    // 'none', daily/weekly/monthly/yearly, weekdays/weekends, days:mon,wed or every:3h / every:2d / every:2w
+    recurrence: z.string().trim().max(60).optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -20,7 +21,14 @@ export default defineEventHandler(async (event) => {
 
     const update: Record<string, any> = {}
     if (heading !== undefined) update.heading = heading
-    if (recurrence !== undefined) update.recurrence = normalizeRecurrence(recurrence)
+    if (recurrence !== undefined) {
+        const normalized = normalizeRecurrence(recurrence)
+        if (!normalized && recurrence.toLowerCase() !== 'none') {
+            throw createError({ statusCode: 400, statusMessage: 'Invalid repeat' })
+        }
+        update.recurrence = normalized
+        update.recurrence_anchor = null
+    }
     if (remind_time !== undefined) {
         const date = new Date(remind_time)
         if (isNaN(date.getTime())) {

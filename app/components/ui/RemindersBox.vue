@@ -26,6 +26,7 @@
 </template>
 <script setup>
 import moment from 'moment'
+import { repeatLabel as formatRepeat } from '~/utils/repeat'
 
 const props = defineProps({
   reminder: { type: Object, required: true },
@@ -33,10 +34,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['edit', 'delete'])
 
-const repeatLabel = computed(() => {
-  const r = props.reminder.recurrence
-  return r && r !== 'none' ? r.charAt(0).toUpperCase() + r.slice(1) : ''
-})
+const repeatLabel = computed(() => formatRepeat(props.reminder.recurrence))
 
 const status = computed(() => {
   const { reminder } = props

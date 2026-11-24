@@ -9,6 +9,8 @@ export interface ReminderEmailInput {
     remindTime: Date
     timezone?: string | null
     recurrence?: string | null
+    /** Ready-made repeat phrase such as "on weekdays" or "every 3 hours"; wins over `recurrence`. */
+    repeatText?: string | null
     /** Absolute link the button opens. Defaults to the dashboard. */
     url?: string
 }
@@ -48,7 +50,7 @@ function repeatLabel(recurrence?: string | null): string {
 export function buildReminderEmail(input: ReminderEmailInput) {
     const heading = String(input.heading ?? '').replace(/\s+/g, ' ').trim() || 'Your reminder'
     const { time, day, timeZone } = formatReminderTime(input.remindTime, input.timezone)
-    const repeat = repeatLabel(input.recurrence)
+    const repeat = input.repeatText ? `Repeats ${input.repeatText}` : repeatLabel(input.recurrence)
     const url = input.url || `${APP_URL}/dashboard`
     const settingsUrl = `${APP_URL}/profile`
 

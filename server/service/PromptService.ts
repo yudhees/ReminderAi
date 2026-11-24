@@ -14,7 +14,12 @@ For questions about previous conversation, carefully distinguish:
 Do not assume that "again", "earlier", "before", etc. refer only to the current message.
 Recurring reminders:
 - When the user asks for a repeating reminder ("every day", "daily", "every Monday", "every week", "monthly", "every year", "on my birthday each year"),
-  set recurrence to daily, weekly, monthly or yearly, and set exact_remind_time to the FIRST future occurrence.
+  set recurrence and set exact_remind_time to the FIRST future occurrence. Allowed recurrence values:
+  daily, weekly, monthly, yearly;
+  weekdays (Monday to Friday, e.g. "every weekday", "on working days"); weekends (Saturday and Sunday);
+  days:<list> for chosen weekdays, using mon,tue,wed,thu,fri,sat,sun (e.g. "every Monday and Thursday" -> days:mon,thu);
+  every:<N>h, every:<N>d or every:<N>w for every N hours (1-23), days (1-365) or weeks (1-52) (e.g. "every 3 hours" -> every:3h, "every other day" -> every:2d, "every 2 weeks" -> every:2w).
+  "every Monday" alone is weekly, starting on the next Monday.
 - If the user wants to stop repeating a reminder in this conversation, keep the existing time and set recurrence to none.
 - One-time reminders always use recurrence none.
 - Mention the repeat schedule in textForChatResponse when there is one.
@@ -55,8 +60,7 @@ Recurring reminders:
                 },
                 recurrence: {
                     type: "string",
-                    enum: ["none", "daily", "weekly", "monthly", "yearly"],
-                    description: "How often the reminder repeats. none for a one-time reminder."
+                    description: "How often the reminder repeats: none, daily, weekly, monthly, yearly, weekdays, weekends, days:mon,wed (chosen weekdays) or every:3h / every:2d / every:2w (every N hours, days or weeks). none for a one-time reminder or when the user asks to stop repeating."
                 }
             },
             required: [
@@ -101,9 +105,10 @@ Recurring reminders:
                 .string()
                 .max(200),
             recurrence: z
-                .enum(["none", "daily", "weekly", "monthly", "yearly"])
+                .string()
+                .max(60)
                 .describe(
-                    "How often the reminder repeats: daily, weekly, monthly or yearly. none for a one-time reminder or when the user asks to stop repeating."
+                    "How often the reminder repeats: none, daily, weekly, monthly, yearly, weekdays, weekends, days:mon,wed (chosen weekdays) or every:3h / every:2d / every:2w (every N hours, days or weeks). none for a one-time reminder or when the user asks to stop repeating."
                 ),
         });
         return outputSchema

@@ -1,4 +1,5 @@
 import moment from "moment"
+import { repeatLabel } from "~/utils/repeat"
 type ChatReponseType = {
     type: "user" | "ai",
     text: string,
@@ -54,6 +55,24 @@ export default function init() {
         } catch (error) {
             console.error(error);
             toastError(error, 'Could not snooze this reminder')
+        }
+        actionBusy.value = false
+    }
+    const setRepeat = async (recurrence: string) => {
+        if (!hasReminder.value) return
+        actionBusy.value = true
+        try {
+            const res = await $fetch<{ reminder: { recurrence: string | null, remind_time: string } }>('/api/reminders/update', {
+                method: "POST",
+                body: { id: sessionId.value, recurrence }
+            })
+            if (session.value) session.value.recurrence = res.reminder.recurrence
+            updateLocalChat(String(sessionId.value), { recurrence: res.reminder.recurrence } as any)
+            const label = repeatLabel(res.reminder.recurrence)
+            $toast.success(label ? `Repeats: ${label}` : 'Repeat turned off')
+        } catch (error) {
+            console.error(error);
+            toastError(error, 'Could not change the repeat')
         }
         actionBusy.value = false
     }
@@ -171,5 +190,5 @@ export default function init() {
         }
         setDescription('')
     })
-    return { chatSend, chatInput, isNew, sendChat, sendChatDisabled, chatResponses, bottomEl, hasReminder, actionBusy, snooze, deleteCurrent }
+    return { chatSend, chatInput, isNew, sendChat, sendChatDisabled, chatResponses, bottomEl, hasReminder, actionBusy, snooze, deleteCurrent, session, setRepeat }
 }

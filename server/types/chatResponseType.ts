@@ -6,7 +6,7 @@ interface ChatResponse{
     textForChatResponse:string,
     timezone:string,
     user_specified_seconds:boolean,
-    recurrence?:'none'|'daily'|'weekly'|'monthly'|'yearly'
+    recurrence?:string
 }
 type InteractionPayload = {
   sessionId: string

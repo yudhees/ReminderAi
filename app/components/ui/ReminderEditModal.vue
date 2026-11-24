@@ -15,15 +15,15 @@
             <input v-model="form.time" type="datetime-local" required :min="minTime"
               class="bg-[#1a1a26] border border-white/10 focus:border-indigo-500/40 rounded-lg px-3 py-2.5 text-base text-slate-100 outline-none [color-scheme:dark] sm:py-2 sm:text-sm" />
           </label>
-          <label class="flex flex-col gap-1.5 text-xs text-slate-400">
+          <div class="flex flex-col gap-1.5 text-xs text-slate-400">
             Repeat
-            <Select v-model="form.recurrence" :options="repeatOptions" class="py-2.5 text-base text-slate-100 sm:py-1.5 sm:text-sm" />
-          </label>
+            <RepeatPicker v-model="form.recurrence" :fallback-day="fallbackDay" />
+          </div>
           <p v-if="error" class="text-xs text-red-400">{{ error }}</p>
         </div>
         <div class="px-5 py-4 border-t border-white/5 flex justify-end gap-2">
           <button type="button" class="rounded-lg px-4 py-2.5 text-sm text-slate-400 hover:bg-[#2a2a3e] sm:px-3.5 sm:py-1.5 sm:text-xs" @click="$emit('close')">Cancel</button>
-          <Button type="submit" class="px-5 py-2.5 text-sm sm:px-3 sm:py-1.5 sm:text-xs" :disabled="saving">{{ saving ? 'Saving…' : 'Save' }}</Button>
+          <Button type="submit" class="px-5 py-2.5 text-sm sm:px-3 sm:py-1.5 sm:text-xs" :disabled="saving || !form.recurrence">{{ saving ? 'Saving…' : 'Save' }}</Button>
         </div>
       </form>
     </div>
@@ -31,25 +31,19 @@
 </template>
 <script setup>
 import moment from 'moment'
-import Select from './Select.vue'
+import RepeatPicker from './RepeatPicker.vue'
 import Button from './Button.vue'
 
 const props = defineProps({ reminder: { type: Object, default: null } })
 const emit = defineEmits(['close', 'saved'])
 
-const repeatOptions = [
-  { label: 'Does not repeat', value: 'none' },
-  { label: 'Every day', value: 'daily' },
-  { label: 'Every week', value: 'weekly' },
-  { label: 'Every month', value: 'monthly' },
-  { label: 'Every year', value: 'yearly' },
-]
 const form = reactive({ heading: '', time: '', recurrence: 'none' })
 const original = reactive({ time: '' })
 const saving = ref(false)
 const error = ref('')
 const titleInput = ref(null)
 const minTime = computed(() => moment().format('YYYY-MM-DDTHH:mm'))
+const fallbackDay = computed(() => (form.time ? moment(form.time, 'YYYY-MM-DDTHH:mm') : moment()).day())
 
 watch(() => props.reminder, (reminder) => {
   if (!reminder) return
@@ -63,6 +57,10 @@ watch(() => props.reminder, (reminder) => {
 
 const save = async () => {
   error.value = ''
+  if (!form.recurrence) {
+    error.value = 'Finish choosing how it repeats.'
+    return
+  }
   const body = { id: props.reminder._id, heading: form.heading.trim(), recurrence: form.recurrence }
   // Only send the time when it changed, so a past reminder can still be renamed.
   if (form.time && form.time !== original.time) {

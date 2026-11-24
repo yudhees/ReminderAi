@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { buildReminderEmail, APP_URL } from '../utils/reminderEmail';
+import { recurrencePhrase } from '../utils/recurrence';
 
 export interface ReminderEmailOptions {
     timezone?: string | null;
@@ -33,6 +34,7 @@ export default class EmailService {
                 remindTime,
                 timezone: options.timezone,
                 recurrence: options.recurrence,
+                repeatText: recurrencePhrase(options.recurrence),
                 url,
             });
             const info = await this.transporter.sendMail({
